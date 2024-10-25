@@ -23,6 +23,18 @@ defmodule Expect.Matchers do
   end
 
   @doc "Verifies that the provided `value` is in the list `expected`"
+  def to_contain(expected, value)
+
+  def to_contain(expected, only: one_value) do
+    if expected.given == [one_value] do
+      expected
+    else
+      raise matcher_error(
+              "Expected '#{inspect(expected.given)}' to only contain '#{inspect(one_value)}'"
+            )
+    end
+  end
+
   def to_contain(expected, value) do
     if value in expected.given do
       expected

@@ -27,11 +27,24 @@ defmodule Expect.MatchersTest do
     end
   end
 
-  test "to_contain matcher" do
-    expect([1, 2, 3]) |> to_contain(1)
+  describe "to_contain matcher" do
+    test "verifies that the value is in the list" do
+      expect([1, 2, 3]) |> to_contain(1)
 
-    assert_raise AssertionError, "Expected '[1, 2, 3]' to contain '\"bananas\"'", fn ->
-      expect([1, 2, 3]) |> to_contain("bananas")
+      assert_raise AssertionError, "Expected '[1, 2, 3]' to contain '\"bananas\"'", fn ->
+        expect([1, 2, 3]) |> to_contain("bananas")
+      end
+    end
+
+    test "verifies that the value is the only one present" do
+      expect([1]) |> to_contain(only: 1)
+
+      # keyword lists are actually a list of tuples of size 2 {:key, value}
+      expect(only: 1) |> to_contain({:only, 1})
+
+      assert_raise AssertionError, "Expected '[1, 2, 3]' to only contain '1'", fn ->
+        expect([1, 2, 3]) |> to_contain(only: 1)
+      end
     end
   end
 

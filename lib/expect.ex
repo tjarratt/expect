@@ -31,5 +31,3 @@ defmodule Expect do
     %Expect.WrappedValue{given: value}
   end
 end
-
-
