@@ -1,5 +1,5 @@
 defmodule Expect.Matchers do
-  # @related [tests](test/expect_assertions_test.exs)
+  # @related [tests](test/expect/matchers_test.exs)
 
   @doc "Verifies that `expected` is equal to `value`"
   def to_equal(expected, value, opts \\ [])
