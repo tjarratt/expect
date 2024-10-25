@@ -81,6 +81,13 @@ defmodule Expect.Matchers do
     end
   end
 
+  @doc "Verifies that `expected` is a falsy value -- either `nil` or `false`"
+  def to_be_truthy(%Expect.WrappedValue{given: falsy}) when is_nil(falsy) or falsy === false do
+    raise matcher_error("Expected '#{inspect(falsy)}' to be truthy")
+  end
+
+  def to_be_truthy(otherwise), do: otherwise
+
   # # # 
 
   defp matcher_error(message) do

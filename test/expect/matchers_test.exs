@@ -79,4 +79,17 @@ defmodule Expect.MatchersTest do
                    expect("WHOOPS") |> to_be_empty()
                  end
   end
+
+  test "to_be_truthy matcher" do
+    expect(true) |> to_be_truthy()
+    expect("anything besides literal nil or false") |> to_be_truthy()
+
+    assert_raise AssertionError, "Expected 'nil' to be truthy", fn ->
+      expect(nil) |> to_be_truthy()
+    end
+
+    assert_raise AssertionError, "Expected 'false' to be truthy", fn ->
+      expect(false) |> to_be_truthy()
+    end
+  end
 end
