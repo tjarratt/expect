@@ -1,6 +1,4 @@
 defmodule Expect do
-  alias Expect.Expect
-
   @moduledoc """
     `Expect` allows you to write simple, clear assertions in your unit tests.
 
@@ -30,11 +28,8 @@ defmodule Expect do
     expect(42) |> to_equal("the answer to life, the universe, and everything")
   """
   def expect(value) do
-    %Expect{given: value}
+    %Expect.WrappedValue{given: value}
   end
 end
 
-defmodule Expect.Expect do
-  @moduledoc false
-  defstruct [:given]
-end
+
