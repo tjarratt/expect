@@ -37,7 +37,6 @@ defmodule Expect.MixProject do
       files: ~w[
         .formatter.exs
         README.*
-        VERSION
         lib
         LICENSE
         mix.exs
