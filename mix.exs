@@ -1,27 +1,48 @@
-defmodule ExpectAssertions.MixProject do
+defmodule Expect.MixProject do
   use Mix.Project
+
+  @github_url "https://github.com/tjarratt/expect"
 
   def project do
     [
-      app: :expect_assertions,
+      app: :expect,
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      name: "Expect",
+      description: "Write beautifully simple assertions for ExUnit using matchers",
+      package: package(),
+      source_url: @github_url,
+      homepage_url: @github_url
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp package() do
+    [
+      files: ~w[
+        .formatter.exs
+        README.*
+        VERSION
+        lib
+        LICENSE
+        mix.exs
+      ],
+      licenses: ["MIT"],
+      links: %{"GitHub" => @github_url},
+      maintainers: ["Tim Jarratt"]
     ]
   end
 end
