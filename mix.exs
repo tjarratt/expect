@@ -26,6 +26,7 @@ defmodule Expect.MixProject do
 
   defp deps do
     [
+      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
