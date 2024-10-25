@@ -8,8 +8,7 @@ defmodule Expect.Matchers do
     if expected.given === value do
       expected
     else
-      raise Expect.AssertionError,
-        message: "Expected '#{inspect(expected.given)}' to strictly equal '#{inspect(value)}'"
+      raise_error("Expected '#{inspect(expected.given)}' to strictly equal '#{inspect(value)}'")
     end
   end
 
@@ -17,8 +16,7 @@ defmodule Expect.Matchers do
     if expected.given == value do
       expected
     else
-      raise Expect.AssertionError,
-        message: "Expected '#{inspect(expected.given)}' to equal '#{inspect(value)}'"
+      raise_error("Expected '#{inspect(expected.given)}' to equal '#{inspect(value)}'")
     end
   end
 
@@ -29,7 +27,7 @@ defmodule Expect.Matchers do
     if expected.given == [one_value] do
       expected
     else
-      raise matcher_error(
+      raise_error(
               "Expected '#{inspect(expected.given)}' to only contain '#{inspect(one_value)}'"
             )
     end
@@ -39,8 +37,7 @@ defmodule Expect.Matchers do
     if value in expected.given do
       expected
     else
-      raise Expect.AssertionError,
-        message: "Expected '#{inspect(expected.given)}' to contain '#{inspect(value)}'"
+      raise_error("Expected '#{inspect(expected.given)}' to contain '#{inspect(value)}'")
     end
   end
 
@@ -48,7 +45,7 @@ defmodule Expect.Matchers do
   def to_be_empty(%{given: given} = expected) do
     case empty?(given) do
       :ok -> expected
-      {:error, message} -> raise matcher_error(message)
+      {:error, message} -> raise_error(message)
     end
   end
 
@@ -76,25 +73,25 @@ defmodule Expect.Matchers do
     if Regex.match?(regex, expected.given) do
       expected
     else
-      raise Expect.AssertionError,
-        message: "Expected '#{inspect(expected.given)}' to match regex '#{inspect(regex)}'"
+      raise_error("Expected '#{inspect(expected.given)}' to match regex '#{inspect(regex)}'")
     end
   end
 
   @doc "Verifies that `expected` is a falsy value -- either `nil` or `false`"
   def to_be_truthy(%Expect.WrappedValue{given: falsy}) when is_nil(falsy) or falsy === false do
-    raise matcher_error("Expected '#{inspect(falsy)}' to be truthy")
+    raise_error("Expected '#{inspect(falsy)}' to be truthy")
   end
 
   def to_be_truthy(otherwise), do: otherwise
 
   # # # 
 
-  defp matcher_error(message) do
+  defp raise_error(message) do
     raise Expect.AssertionError, message: message
   end
 end
 
 defmodule Expect.AssertionError do
+  @moduledoc false
   defexception [:message]
 end
