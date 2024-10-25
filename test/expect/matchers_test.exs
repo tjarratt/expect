@@ -1,11 +1,11 @@
-defmodule ExpectAssertionsTest do
-  # @related [subject](lib/expect_assertions.ex)
+defmodule Expect.MatchersTest do
+  # @related [subject](lib/expect/matchers.ex)
   use ExUnit.Case
 
-  alias ExpectAssertions.AssertionError
+  alias Expect.AssertionError
 
-  import ExpectAssertions
-  import ExpectAssertions.Matchers
+  import Expect
+  import Expect.Matchers
 
   test "equals matcher" do
     expect(true) |> to_equal(true)

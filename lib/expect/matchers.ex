@@ -1,8 +1,4 @@
-defmodule ExpectAssertions.Expect do
-  defstruct [:given]
-end
-
-defmodule ExpectAssertions.Matchers do
+defmodule Expect.Matchers do
   # @related [tests](test/expect_assertions_test.exs)
 
   @doc "Verifies that `expected` is equal to `value`"
@@ -12,7 +8,7 @@ defmodule ExpectAssertions.Matchers do
     if expected.given === value do
       expected
     else
-      raise ExpectAssertions.AssertionError,
+      raise Expect.AssertionError,
         message: "Expected '#{inspect(expected.given)}' to strictly equal '#{inspect(value)}'"
     end
   end
@@ -21,7 +17,7 @@ defmodule ExpectAssertions.Matchers do
     if expected.given == value do
       expected
     else
-      raise ExpectAssertions.AssertionError,
+      raise Expect.AssertionError,
         message: "Expected '#{inspect(expected.given)}' to equal '#{inspect(value)}'"
     end
   end
@@ -31,7 +27,7 @@ defmodule ExpectAssertions.Matchers do
     if value in expected.given do
       expected
     else
-      raise ExpectAssertions.AssertionError,
+      raise Expect.AssertionError,
         message: "Expected '#{inspect(expected.given)}' to contain '#{inspect(value)}'"
     end
   end
@@ -68,7 +64,7 @@ defmodule ExpectAssertions.Matchers do
     if Regex.match?(regex, expected.given) do
       expected
     else
-      raise ExpectAssertions.AssertionError,
+      raise Expect.AssertionError,
         message: "Expected '#{inspect(expected.given)}' to match regex '#{inspect(regex)}'"
     end
   end
@@ -76,18 +72,10 @@ defmodule ExpectAssertions.Matchers do
   # # # 
 
   defp matcher_error(message) do
-    raise ExpectAssertions.AssertionError, message: message
+    raise Expect.AssertionError, message: message
   end
 end
 
-defmodule ExpectAssertions.AssertionError do
+defmodule Expect.AssertionError do
   defexception [:message]
-end
-
-defmodule ExpectAssertions do
-  alias ExpectAssertions.Expect
-
-  def expect(value) do
-    %Expect{given: value}
-  end
 end
