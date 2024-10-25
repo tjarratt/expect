@@ -3,21 +3,25 @@ defmodule ExpectAssertions.Expect do
 end
 
 defmodule ExpectAssertions.Matchers do
-  def to_equal(expected, other) do
-    if expected.given == other do
+  # @related [tests](test/expect_assertions_test.exs)
+
+  @doc "Verifies that `expected` is equal to `value`"
+  def to_equal(expected, value) do
+    if expected.given == value do
       expected
     else
-      raise ExpectAssertions.AssertionError, 
-        message: "Expected '#{inspect(expected.given)}' to equal '#{inspect(other)}'"
+      raise ExpectAssertions.AssertionError,
+        message: "Expected '#{inspect(expected.given)}' to equal '#{inspect(value)}'"
     end
   end
 
-  def to_contain(expected, other) do
-    if other in expected.given do
+  @doc "Verifies that the provided `value` is in the list `expected`"
+  def to_contain(expected, value) do
+    if value in expected.given do
       expected
     else
-      raise ExpectAssertions.AssertionError, 
-        message: "Expected '#{inspect(expected.given)}' to contain '#{inspect(other)}'"
+      raise ExpectAssertions.AssertionError,
+        message: "Expected '#{inspect(expected.given)}' to contain '#{inspect(value)}'"
     end
   end
 
@@ -48,6 +52,7 @@ defmodule ExpectAssertions.Matchers do
     {:error, "Expected '#{inspect(otherwise)}' to be empty, but it's not a list, map, or tuple."}
   end
 
+  @doc "Matches `expected` against the provided regular expression using `Regex.match?`"
   def to_match_regex(expected, regex) do
     if Regex.match?(regex, expected.given) do
       expected
