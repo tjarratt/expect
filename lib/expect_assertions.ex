@@ -7,6 +7,7 @@ defmodule ExpectAssertions.Matchers do
 
   @doc "Verifies that `expected` is equal to `value`"
   def to_equal(expected, value, opts \\ [])
+
   def to_equal(expected, value, :strict) do
     if expected.given === value do
       expected
