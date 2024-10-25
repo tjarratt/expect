@@ -27,9 +27,7 @@ defmodule Expect.Matchers do
     if expected.given == [one_value] do
       expected
     else
-      raise_error(
-              "Expected '#{inspect(expected.given)}' to only contain '#{inspect(one_value)}'"
-            )
+      raise_error("Expected '#{inspect(expected.given)}' to only contain '#{inspect(one_value)}'")
     end
   end
 
