@@ -11,14 +11,19 @@ defmodule ExpectAssertionsTest do
     expect(true) |> to_equal(true)
     expect(1234) |> to_equal(1234)
     expect("ok") |> to_equal("ok")
-    expect(:ok) |> to_equal(:ok)
+    expect(:ok)  |> to_equal(:ok)
+    expect(1)    |> to_equal(1.0)
 
-    assert_raise AssertionError, "Expected 'true' to equal 'false'", fn ->
+    assert_raise AssertionError, "Expected 'true' to equal 'false'", fn -> 
       expect(true) |> to_equal(false)
     end
 
-    assert_raise AssertionError, "Expected '[1, 2, 3]' to equal '[4, 5, 6]'", fn ->
-      expect([1, 2, 3]) |> to_equal([4, 5, 6])
+    assert_raise AssertionError, "Expected '1' to strictly equal '1.0'", fn ->
+      expect(1) |> to_equal(1.0, :strict)
+    end
+
+    assert_raise AssertionError, "Expected '[1, 2, 3]' to equal '[4, 5, 6]'", fn -> 
+      expect([1,2,3]) |> to_equal([4,5,6])
     end
   end
 
