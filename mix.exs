@@ -35,7 +35,6 @@ defmodule Expect.MixProject do
   defp package() do
     [
       files: ~w[
-        .formatter.exs
         README.*
         lib
         LICENSE
