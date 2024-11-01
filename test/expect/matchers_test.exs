@@ -1,6 +1,6 @@
 defmodule Expect.MatchersTest do
   # @related [subject](lib/expect/matchers.ex)
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Expect.AssertionError
 
@@ -91,5 +91,15 @@ defmodule Expect.MatchersTest do
     assert_raise AssertionError, "Expected 'false' to be truthy", fn ->
       expect(false) |> to_be_truthy()
     end
+  end
+
+  test "to_be_nil matcher" do
+    expect(nil) |> to_be_nil()
+
+    raises_error(fn -> expect("not nil") |> to_be_nil() end, ~s[Expected '"not nil"' to be nil])
+  end
+
+  defp raises_error(callable, reason) do
+    assert_raise AssertionError, reason, callable
   end
 end

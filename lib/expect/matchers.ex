@@ -82,6 +82,14 @@ defmodule Expect.Matchers do
 
   def to_be_truthy(otherwise), do: otherwise
 
+  @doc "Verifies that `expected` is nil"
+  @spec to_be_nil(Expect.WrappedValue.t()) :: Expect.WrappedValue.t()
+  def to_be_nil(%Expect.WrappedValue{given: nil} = expected), do: expected
+
+  def to_be_nil(otherwise) do
+    raise_error("Expected '#{inspect(otherwise.given)}' to be nil")
+  end
+
   # # # 
 
   defp raise_error(message) do
