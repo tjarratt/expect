@@ -1,4 +1,6 @@
 defmodule Expect do
+  # @related [test](test/expect_test.exs)
+
   @moduledoc """
     `Expect` allows you to write simple, clear assertions in your unit tests.
 
