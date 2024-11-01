@@ -96,10 +96,8 @@ defmodule Expect.MatchersTest do
   test "to_be_nil matcher" do
     expect(nil) |> to_be_nil()
 
-    raises_error(fn -> expect("not nil") |> to_be_nil() end, ~s[Expected '"not nil"' to be nil])
-  end
-
-  defp raises_error(callable, reason) do
-    assert_raise AssertionError, reason, callable
+    assert_raise AssertionError, ~s[Expected '"not nil"' to be nil], fn ->
+      expect("not nil") |> to_be_nil()
+    end
   end
 end
