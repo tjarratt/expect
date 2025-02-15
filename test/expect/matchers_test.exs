@@ -100,4 +100,22 @@ defmodule Expect.MatchersTest do
       expect("not nil") |> to_be_nil()
     end
   end
+
+  test "length matcher" do
+    expect([]) |> to_have_length(0)
+    expect([:madness]) |> to_have_length(1)
+    expect(hello: :world) |> to_have_length(1)
+
+    expect("hello") |> to_have_length(5)
+
+    assert_raise AssertionError, ~s<Expected '[]' to have length 99, but it is actually 0>, fn ->
+      expect([]) |> to_have_length(99)
+    end
+
+    assert_raise AssertionError,
+                 ~s[Expected 'nil' to have length 99, but it is neither a list nor a string],
+                 fn ->
+                   expect(nil) |> to_have_length(99)
+                 end
+  end
 end

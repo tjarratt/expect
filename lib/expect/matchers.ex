@@ -90,6 +90,40 @@ defmodule Expect.Matchers do
     raise_error("Expected '#{inspect(otherwise.given)}' to be nil")
   end
 
+  @doc "Verifies that `expected` is either a List or String with the given length"
+  @spec to_have_length(Expect.WrappedValue.t(), non_neg_integer()) :: Expect.WrappedValue.t()
+  def to_have_length(expected = %Expect.WrappedValue{given: list}, expected_length)
+      when is_list(list) do
+    actual_length = length(list)
+
+    if actual_length == expected_length do
+      expected
+    else
+      raise_error(
+        "Expected '#{inspect(expected.given)}' to have length #{expected_length}, but it is actually #{actual_length}"
+      )
+    end
+  end
+
+  def to_have_length(expected = %Expect.WrappedValue{given: list}, expected_length)
+      when is_binary(list) do
+    actual_length = String.length(list)
+
+    if actual_length == expected_length do
+      expected
+    else
+      raise_error(
+        "Expected '#{inspect(expected.given)}' to have length #{expected_length}, but it is actually #{actual_length}"
+      )
+    end
+  end
+
+  def to_have_length(expected, expected_length) do
+    raise_error(
+      "Expected '#{inspect(expected.given)}' to have length #{expected_length}, but it is neither a list nor a string"
+    )
+  end
+
   # # # 
 
   defp raise_error(message) do
