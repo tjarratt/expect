@@ -23,7 +23,7 @@ Add `expect` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:expect_assertions, "~> 0.1.0"}
+    {:expect, "~> 0.1.0"}
   ]
 end
 ```
