@@ -118,4 +118,16 @@ defmodule Expect.MatchersTest do
                    expect(nil) |> to_have_length(99)
                  end
   end
+
+  describe "to_match matcher" do
+    test "can pattern match maps, lists, tuples, and structs" do
+      expect(%{hello: _whom}, to_match: %{hello: "world"})
+    end
+
+    test "shows an informative error when the pattern match fails" do
+      assert_raise AssertionError,
+                   ~s[Expected '%{hello: "whoopsie"}' to match against '%{hello: "world"}', but it did not.],
+                   fn -> expect(%{hello: "whoopsie"}, to_match: %{hello: "world"}) end
+    end
+  end
 end

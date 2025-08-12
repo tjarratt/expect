@@ -6,6 +6,8 @@ defmodule ExpectTest do
 
   describe "using the expect/1 function" do
     test "works if you pass it built-in types" do
+      assert expect(nil)
+      assert expect(true)
       assert expect(1)
       assert expect(1.0)
       assert expect("yup")

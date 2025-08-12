@@ -29,7 +29,28 @@ defmodule Expect do
     # raises an error
     expect(42) |> to_equal("the answer to life, the universe, and everything")
   """
-  def expect(value) do
-    %Expect.WrappedValue{given: value}
+
+  defmacro expect(given, args) do
+    actual = Keyword.get(args, :to_match)
+
+    given_as_string = Macro.to_string(given)
+    actual_as_string = Macro.to_string(actual)
+
+    quote do
+      try do
+        unquote(given) = unquote(actual)
+      rescue
+        MatchError ->
+          raise Expect.AssertionError,
+            message:
+              "Expected '#{unquote(given_as_string)}' to match against '#{unquote(actual_as_string)}', but it did not."
+      end
+    end
+  end
+
+  defmacro expect(value) do
+    quote do
+      %Expect.WrappedValue{given: unquote(value)}
+    end
   end
 end
