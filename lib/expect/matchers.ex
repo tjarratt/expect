@@ -1,42 +1,67 @@
 defmodule Expect.Matchers do
   # @related [tests](test/expect/matchers_test.exs)
 
-  @doc "Verifies that `expected` is equal to `value`"
-  def to_equal(expected, value, opts \\ [])
+  @moduledoc """
+    A matcher is responsible for providing expect() three things
 
-  def to_equal(expected, value, :strict) do
-    if expected.given === value do
-      expected
-    else
-      raise_error("Expected '#{inspect(expected.given)}' to strictly equal '#{inspect(value)}'")
-    end
+    1. the name for the matcher
+    2. the value that was matched against (optional)
+    3. a function to invoke with the given value to `expect()`
+
+    Expect will invoke the function, and if it fails to match as expected, it will
+    construct an error message using the name and the value.
+
+    For example, given a matcher that returns `{"be cool", nil, fn given -> given =~ "cool" end}`,
+    we could expect the following result
+
+    ```
+    expect("literal fire", to: be_cool())
+    # raises an error with message "Expected 'literal fire' to be cool, but it was not"
+    ```
+
+    Alternatively, a matcher that returns `{"be greater than", 5, fn given -> given > 5 end}`
+    would have the following result
+
+    ```
+    expect(0, to: be_greater_than(5))
+    # raises an error with message "Expected '0' to be greater than '5'"
+    ```
+  """
+  @type t :: {String.t(), any(), (any() -> bool())}
+
+  @doc """
+  Verifies that `expected` is equal to `value`, using `==`.
+
+  If you want to verify strict equality with `===` then use `strict: true`
+
+  `expect(1, to: equal(1.0, strict: true))`
+  """
+  @spec be_equal_to(any(), Keyword.t()) :: t()
+  def be_equal_to(value, opts \\ [])
+
+  def be_equal_to(value, :strict) do
+    {"strictly equal", value, fn given -> given === value end}
   end
 
-  def to_equal(expected, value, _opts) do
-    if expected.given == value do
-      expected
-    else
-      raise_error("Expected '#{inspect(expected.given)}' to equal '#{inspect(value)}'")
-    end
+  def be_equal_to(value, _opts) do
+    {"equal", value, fn given -> given == value end}
   end
 
-  @doc "Verifies that the provided `value` is in the list `expected`"
-  def to_contain(expected, value)
+  @doc """
+  Verifies that the provided `value` is in the list `expected`
 
-  def to_contain(expected, only: one_value) do
-    if expected.given == [one_value] do
-      expected
-    else
-      raise_error("Expected '#{inspect(expected.given)}' to only contain '#{inspect(one_value)}'")
-    end
+  If you want to verify that the list ONLY contains the one value then use `:only`
+
+  `expect([1], to: contain(only: 1))`
+  """
+  @spec contain(any()) :: t()
+  @spec contain(only: any()) :: t()
+  def contain(only: one_value) do
+    {"only contain", one_value, fn given -> given == [one_value] end}
   end
 
-  def to_contain(expected, value) do
-    if value in expected.given do
-      expected
-    else
-      raise_error("Expected '#{inspect(expected.given)}' to contain '#{inspect(value)}'")
-    end
+  def contain(value) do
+    {"contain", value, fn given -> value in given end}
   end
 
   @doc "Verifies that `expected` is an empty list, map, or tuple"
@@ -124,7 +149,7 @@ defmodule Expect.Matchers do
     )
   end
 
-  # # # 
+  # # #
 
   defp raise_error(message) do
     raise Expect.AssertionError, message: message

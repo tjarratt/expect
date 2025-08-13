@@ -8,42 +8,43 @@ defmodule Expect.MatchersTest do
   import Expect.Matchers
 
   test "equals matcher" do
-    expect(true) |> to_equal(true)
-    expect(1234) |> to_equal(1234)
-    expect("ok") |> to_equal("ok")
-    expect(:ok) |> to_equal(:ok)
-    expect(1) |> to_equal(1.0)
+    expect(true, to: be_equal_to(true))
+    expect(1234, to: be_equal_to(1234))
+    expect("ok", to: be_equal_to("ok"))
+    expect(:ok, to: be_equal_to(:ok))
+    expect(1, to: be_equal_to(1.0))
 
     assert_raise AssertionError, "Expected 'true' to equal 'false'", fn ->
-      expect(true) |> to_equal(false)
+      expect(true, to: be_equal_to(false))
     end
 
     assert_raise AssertionError, "Expected '1' to strictly equal '1.0'", fn ->
-      expect(1) |> to_equal(1.0, :strict)
+      expect(1, to: be_equal_to(1.0, :strict))
     end
 
     assert_raise AssertionError, "Expected '[1, 2, 3]' to equal '[4, 5, 6]'", fn ->
-      expect([1, 2, 3]) |> to_equal([4, 5, 6])
+      expect([1, 2, 3], to: be_equal_to([4, 5, 6]))
     end
   end
 
   describe "to_contain matcher" do
     test "verifies that the value is in the list" do
-      expect([1, 2, 3]) |> to_contain(1)
+      expect([1, 2, 3], to: contain(1))
 
       assert_raise AssertionError, "Expected '[1, 2, 3]' to contain '\"bananas\"'", fn ->
-        expect([1, 2, 3]) |> to_contain("bananas")
+        expect([1, 2, 3], to: contain("bananas"))
       end
     end
 
     test "verifies that the value is the only one present" do
-      expect([1]) |> to_contain(only: 1)
+      expect([1], to: contain(only: 1))
 
-      # keyword lists are actually a list of tuples of size 2 {:key, value}
-      expect(only: 1) |> to_contain({:only, 1})
+      # nb: keyword lists are actually just syntactic sugar for a list of tuples of size 2 {:key, value}
+      #     (this is why a keyword list can contain the same key multiple times, unlike a map)
+      expect([only: 1], to: contain({:only, 1}))
 
       assert_raise AssertionError, "Expected '[1, 2, 3]' to only contain '1'", fn ->
-        expect([1, 2, 3]) |> to_contain(only: 1)
+        expect([1, 2, 3], to: contain(only: 1))
       end
     end
   end
