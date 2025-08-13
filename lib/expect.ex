@@ -5,7 +5,7 @@ defmodule Expect do
     `Expect` allows you to write simple, clear assertions in your unit tests.
 
     While initially this may appear to be a simple case of style, over time
-    you will find that these assertions read better, simplify your tests, 
+    you will find that these assertions read better, simplify your tests,
     and allow you to write tests that more clearly reveal their intent.
 
     Instead of writing the following...
