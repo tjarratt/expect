@@ -31,13 +31,13 @@ defmodule Expect do
   """
 
   defmacro expect(given, args \\ []) do
-    case Keyword.get(args, :to_match) do
-      nil ->
+    case args do
+      [] ->
         quote do
           %Expect.WrappedValue{given: unquote(given)}
         end
 
-      actual ->
+      [to_match: actual] ->
         given_as_string = Macro.to_string(given)
         actual_as_string = Macro.to_string(actual)
 
@@ -48,7 +48,35 @@ defmodule Expect do
             MatchError ->
               raise Expect.AssertionError,
                 message:
-                  "Expected '#{unquote(given_as_string)}' to match against '#{unquote(actual_as_string)}', but it did not."
+                  "Expected '#{unquote(given_as_string)}' to match pattern '#{unquote(actual_as_string)}', but it did not."
+          end
+        end
+
+      [to: xyz] ->
+        given_as_string = Macro.to_string(given)
+
+        quote do
+          {condition, actual, matcher} = unquote(xyz)
+          actual_as_string = inspect(actual)
+
+          if not matcher.(unquote(given)) do
+            raise Expect.AssertionError,
+              message:
+                "Expected '#{unquote(given_as_string)}' to #{condition} '#{actual_as_string}'"
+          end
+        end
+
+      [to_not: xyz] ->
+        given_as_string = Macro.to_string(given)
+
+        quote do
+          {condition, actual, matcher} = unquote(xyz)
+          actual_as_string = inspect(actual)
+
+          if matcher.(unquote(given)) do
+            raise Expect.AssertionError,
+              message:
+                "Expected '#{unquote(given_as_string)}' to not #{condition} '#{actual_as_string}'"
           end
         end
     end
