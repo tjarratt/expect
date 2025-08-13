@@ -58,27 +58,33 @@ defmodule Expect.MatchersTest do
   end
 
   test "to_be_empty matcher" do
-    expect([]) |> to_be_empty()
-    expect(%{}) |> to_be_empty()
-    expect({}) |> to_be_empty()
+    expect([], to: be_empty())
+    expect(%{}, to: be_empty())
+    expect({}, to: be_empty())
 
-    assert_raise AssertionError, "Expected list '[1]' to be empty", fn ->
-      expect([1]) |> to_be_empty()
+    expect([1], to_not: be_empty())
+    expect(%{key: "value"}, to_not: be_empty())
+    expect({1}, to_not: be_empty())
+
+    assert_raise AssertionError, "Expected '[1]' to be empty", fn ->
+      expect([1], to: be_empty())
     end
 
-    assert_raise AssertionError, "Expected tuple '{1}' to be empty", fn ->
-      expect({1}) |> to_be_empty()
+    assert_raise AssertionError, "Expected '{1}' to be empty", fn ->
+      expect({1}, to: be_empty())
     end
 
-    assert_raise AssertionError, "Expected map '%{key: \"value\"}' to be empty", fn ->
-      expect(%{key: "value"}) |> to_be_empty()
+    assert_raise AssertionError, "Expected '%{key: \"value\"}' to be empty", fn ->
+      expect(%{key: "value"}, to: be_empty())
     end
 
     assert_raise AssertionError,
-                 "Expected '\"WHOOPS\"' to be empty, but it's not a list, map, or tuple.",
-                 fn ->
-                   expect("WHOOPS") |> to_be_empty()
-                 end
+                 ~s[Expected '"WHOOPS"' to be empty, but it's not a list, map, or tuple.],
+                 fn -> expect("WHOOPS", to: be_empty()) end
+
+    assert_raise AssertionError,
+                 ~s[Expected '"WHOOPS"' to not be empty, but it's not a list, map, or tuple.],
+                 fn -> expect("WHOOPS", to_not: be_empty()) end
   end
 
   test "to_be_truthy matcher" do

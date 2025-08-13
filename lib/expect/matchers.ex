@@ -27,7 +27,7 @@ defmodule Expect.Matchers do
     # raises an error with message "Expected '0' to be greater than '5'"
     ```
   """
-  @type t :: {String.t(), any(), (any() -> bool())}
+  @type t :: {matcher_name :: String.t(), matched_against :: any(), (given :: any() -> bool())}
 
   @doc """
   Verifies that `expected` is equal to `value`, using `==`.
@@ -64,31 +64,23 @@ defmodule Expect.Matchers do
     {"contain", value, fn given -> value in given end}
   end
 
+  @spec be_empty() :: t()
   @doc "Verifies that `expected` is an empty list, map, or tuple"
-  def to_be_empty(%{given: given} = expected) do
-    case empty?(given) do
-      :ok -> expected
-      {:error, message} -> raise_error(message)
-    end
+  def be_empty() do
+    {"be empty", nil, &empty?/1}
   end
 
-  defp empty?([]), do: :ok
-  defp empty?([_ | _rest] = list), do: {:error, "Expected list '#{inspect(list)}' to be empty"}
+  defp empty?([]), do: true
+  defp empty?([_ | _rest] = _list), do: false
 
-  defp empty?({}), do: :ok
+  defp empty?({}), do: true
+  defp empty?(tuple) when is_tuple(tuple), do: false
 
-  defp empty?(tuple) when is_tuple(tuple) do
-    {:error, "Expected tuple '#{inspect(tuple)}' to be empty"}
-  end
+  defp empty?(map) when is_map(map) and map_size(map) == 0, do: true
+  defp empty?(map) when is_map(map), do: false
 
-  defp empty?(map) when is_map(map) and map_size(map) == 0, do: :ok
-
-  defp empty?(map) when is_map(map) do
-    {:error, "Expected map '#{inspect(map)}' to be empty"}
-  end
-
-  defp empty?(otherwise) do
-    {:error, "Expected '#{inspect(otherwise)}' to be empty, but it's not a list, map, or tuple."}
+  defp empty?(_otherwise) do
+    {:error, "be empty, but it's not a list, map, or tuple."}
   end
 
   @doc "Matches `expected` against the provided regular expression using `Regex.match?`"

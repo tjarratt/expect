@@ -52,33 +52,53 @@ defmodule Expect do
           end
         end
 
-      [to: xyz] ->
+      [to: matcher_args] ->
         given_as_string = Macro.to_string(given)
 
         quote do
-          {condition, actual, matcher} = unquote(xyz)
-          actual_as_string = inspect(actual)
+          {condition, actual, matcher} = unquote(matcher_args)
 
-          if not matcher.(unquote(given)) do
-            raise Expect.AssertionError,
-              message:
-                "Expected '#{unquote(given_as_string)}' to #{condition} '#{actual_as_string}'"
+          case matcher.(unquote(given)) do
+            true ->
+              :ok
+
+            false ->
+              raise_error(unquote(given_as_string), "to", condition, actual)
+
+            {:error, reason} ->
+              raise Expect.AssertionError,
+                message: "Expected '#{unquote(given_as_string)}' to #{reason}"
           end
         end
 
-      [to_not: xyz] ->
+      [to_not: matcher_args] ->
         given_as_string = Macro.to_string(given)
 
         quote do
-          {condition, actual, matcher} = unquote(xyz)
-          actual_as_string = inspect(actual)
+          {condition, actual, matcher} = unquote(matcher_args)
 
-          if matcher.(unquote(given)) do
-            raise Expect.AssertionError,
-              message:
-                "Expected '#{unquote(given_as_string)}' to not #{condition} '#{actual_as_string}'"
+          case matcher.(unquote(given)) do
+            false ->
+              :ok
+
+            true ->
+              raise_error(unquote(given_as_string), "to not", condition, actual)
+
+            {:error, reason} ->
+              raise Expect.AssertionError,
+                message: "Expected '#{unquote(given_as_string)}' to not #{reason}"
           end
         end
     end
+  end
+
+  def raise_error(given, proposition, matcher_property, nil) do
+    raise Expect.AssertionError,
+      message: "Expected '#{given}' #{proposition} #{matcher_property}"
+  end
+
+  def raise_error(given, proposition, matcher_property, actual) do
+    raise Expect.AssertionError,
+      message: "Expected '#{given}' #{proposition} #{matcher_property} '#{inspect(actual)}'"
   end
 end
