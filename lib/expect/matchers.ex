@@ -103,51 +103,41 @@ defmodule Expect.Matchers do
   end
 
   @doc "Verifies that `expected` is nil"
-  @spec to_be_nil(Expect.WrappedValue.t()) :: Expect.WrappedValue.t()
-  def to_be_nil(%Expect.WrappedValue{given: nil} = expected), do: expected
-
-  def to_be_nil(otherwise) do
-    raise_error("Expected '#{inspect(otherwise.given)}' to be nil")
+  @spec be_nil() :: t()
+  def be_nil() do
+    {"be nil", nil,
+     fn
+       nil -> true
+       _otherwise -> false
+     end}
   end
 
   @doc "Verifies that `expected` is either a List or String with the given length"
-  @spec to_have_length(Expect.WrappedValue.t(), non_neg_integer()) :: Expect.WrappedValue.t()
-  def to_have_length(expected = %Expect.WrappedValue{given: list}, expected_length)
-      when is_list(list) do
+  @spec have_length(non_neg_integer()) :: t()
+  def have_length(expected_length) do
+    {"have length", expected_length, &verify_length(&1, expected_length)}
+  end
+
+  defp verify_length(list, expected_length)
+       when is_list(list) do
     actual_length = length(list)
 
     if actual_length == expected_length do
-      expected
+      true
     else
-      raise_error(
-        "Expected '#{inspect(expected.given)}' to have length #{expected_length}, but it is actually #{actual_length}"
-      )
+      {:error, "have length #{expected_length}, but it is actually #{actual_length}"}
     end
   end
 
-  def to_have_length(expected = %Expect.WrappedValue{given: list}, expected_length)
-      when is_binary(list) do
-    actual_length = String.length(list)
+  defp verify_length(binary, expected_length)
+       when is_binary(binary) do
+    actual_length = String.length(binary)
 
-    if actual_length == expected_length do
-      expected
-    else
-      raise_error(
-        "Expected '#{inspect(expected.given)}' to have length #{expected_length}, but it is actually #{actual_length}"
-      )
-    end
+    actual_length == expected_length
   end
 
-  def to_have_length(expected, expected_length) do
-    raise_error(
-      "Expected '#{inspect(expected.given)}' to have length #{expected_length}, but it is neither a list nor a string"
-    )
-  end
-
-  # # #
-
-  defp raise_error(message) do
-    raise Expect.AssertionError, message: message
+  defp verify_length(_bad_input, expected_length) do
+    {:error, "have length #{expected_length}, but it is neither a list nor a string"}
   end
 end
 
