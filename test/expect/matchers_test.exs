@@ -126,7 +126,7 @@ defmodule Expect.MatchersTest do
                  end
   end
 
-  describe "to_match matcher" do
+  describe "pattern_match matcher" do
     test "can pattern match maps, lists, tuples, and structs" do
       expect(%{hello: _whom}, to: pattern_match(%{hello: "world"}))
     end

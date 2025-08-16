@@ -140,6 +140,25 @@ defmodule Expect.Matchers do
     {:error, "have length #{expected_length}, but it is neither a list nor a string"}
   end
 
+  @doc """
+    Verifies that the given value matches against the given pattern.
+
+    ```
+    expect({:ok, _msg}, to: pattern_match({:ok, "this is fine"}))
+
+    expect({:ok, _msg}, to: pattern_match({:error, "this is NOT fine !!!"}))
+    # raises an error
+
+    # you can also pass in variables for the pattern
+    result = {:error, "oh gods everything is on fire"}
+    expect({:error, _reason}, to: pattern_match(result))
+
+    # nb : you do not want to pass in variables for the given value
+    # this test will never fail, as it effectively re-assigns the variable `whoops`
+    whoops = :ok
+    expect(whoops, to: pattern_match(:error))
+    ```
+  """
   defmacro pattern_match(expected) do
     {:pattern_match, expected}
   end
