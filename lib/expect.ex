@@ -52,6 +52,23 @@ defmodule Expect do
           end
         end
 
+      [to_not: {:pattern_match, _where, [actual]}] ->
+        given_as_string = Macro.to_string(given)
+        actual_as_string = Macro.to_string(actual)
+
+        quote do
+          try do
+            unquote(given) = unquote(actual)
+
+            raise Expect.AssertionError,
+              message:
+                "Expected '#{unquote(given_as_string)}' to not match pattern '#{unquote(actual_as_string)}', but it did."
+          rescue
+            MatchError ->
+              :ok
+          end
+        end
+
       [to: matcher_args] ->
         given_as_string = Macro.to_string(given)
 
