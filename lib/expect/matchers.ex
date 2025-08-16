@@ -2,7 +2,7 @@ defmodule Expect.Matchers do
   # @related [tests](test/expect/matchers_test.exs)
 
   @moduledoc """
-    A matcher is responsible for providing expect() three things
+    A matcher is responsible for providing `expect/2` three things
 
     1. the name for the matcher
     2. the value that was matched against (optional)
@@ -11,12 +11,12 @@ defmodule Expect.Matchers do
     Expect will invoke the function, and if it fails to match as expected, it will
     construct an error message using the name and the value.
 
-    For example, given a matcher that returns `{"be cool", nil, fn given -> given =~ "cool" end}`,
+    For example, given a matcher that returns `{"end with", "cool", fn given -> String.ends_with?(given, "cool") end}`,
     we could expect the following result
 
     ```
-    expect("literal fire", to: be_cool())
-    # raises an error with message "Expected 'literal fire' to be cool, but it was not"
+    expect("literal fire", to: end_with("cool"))
+    # raises an error with message "Expected '"literal fire"' to end with '"cool"', but it did not"
     ```
 
     Alternatively, a matcher that returns `{"be greater than", 5, fn given -> given > 5 end}`
@@ -25,6 +25,43 @@ defmodule Expect.Matchers do
     ```
     expect(0, to: be_greater_than(5))
     # raises an error with message "Expected '0' to be greater than '5'"
+    ```
+
+    # Custom failure messages
+
+    By default, when a matcher fails, the error message will use the name of the matcher, and the value matched against.
+
+    eg: given a matcher returns `{"start with", "gravy", fn given -> String.starts_with?(given, "gravy") end}`
+    we could expect the following line to fail
+
+    ```
+    expect("groovy train", to: start_with("gravy"))
+    # fails with message "Expected '\"groovy train\"' to start with '\"gravy\"'"
+    ```
+
+    If you are writing a matcher that doesn't compare the given value against something else, you can do the following
+
+    ```
+    def start_with_a, do: {"start with the letter 'a'", Expect.Matchers.without_any_value(), fn given -> String.starts_with?(given, "A") end}`
+
+    expect("algebra", to: start_with_a())
+    # passes
+
+    expect("monotonic", to: start_with_a())
+    # fails with message "Expected '"monotonic"' to start with the letter 'a'"
+    ```
+
+    # Custom error messages
+
+    Sometimes, a matcher might receive input that it is incapable of dealing with. A matcher that wants to
+    verify if a string has a certain prefix would be unable to handle input that is not a string. This can be
+    handled by returning an error tuple from a matcher
+
+    ```
+    def end_with(suffix) do: {"end with", suffix, &verify_suffix(&1, suffix)}
+
+    defp verify_suffix(given, suffix) when is_binary(given), do: String.ends_with?(given, suffix)
+    defp verify_suffix(given, suffix), do: {:error, "end with '#\{suffix}', but it was not a string"}
     ```
   """
   @type t :: {matcher_name :: String.t(), matched_against :: any(), (given :: any() -> bool())}
@@ -67,7 +104,7 @@ defmodule Expect.Matchers do
   @doc "Verifies that `expected` is an empty list, map, or tuple"
   @spec be_empty() :: t()
   def be_empty() do
-    {"be empty", nil, &empty?/1}
+    {"be empty", without_any_value(), &empty?/1}
   end
 
   defp empty?([]), do: true
@@ -92,7 +129,7 @@ defmodule Expect.Matchers do
   @doc "Verifies that `expected` is a falsy value -- either `nil` or `false`"
   @spec be_truthy() :: t()
   def be_truthy() do
-    {"be truthy", nil,
+    {"be truthy", without_any_value(),
      fn given ->
        case given do
          nil -> false
@@ -105,7 +142,7 @@ defmodule Expect.Matchers do
   @doc "Verifies that `expected` is nil"
   @spec be_nil() :: t()
   def be_nil() do
-    {"be nil", nil,
+    {"be nil", without_any_value(),
      fn
        nil -> true
        _otherwise -> false
@@ -162,6 +199,12 @@ defmodule Expect.Matchers do
   defmacro pattern_match(expected) do
     {:pattern_match, expected}
   end
+
+  # # # Support for custom matchers
+  @doc false
+  defmodule NoValue, do: defstruct([])
+
+  def without_any_value(), do: %Expect.Matchers.NoValue{}
 end
 
 defmodule Expect.AssertionError do

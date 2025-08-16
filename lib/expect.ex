@@ -109,11 +109,13 @@ defmodule Expect do
     end
   end
 
-  def raise_error(given, proposition, matcher_property, nil) do
+  @doc false
+  def raise_error(given, proposition, matcher_property, %Expect.Matchers.NoValue{}) do
     raise Expect.AssertionError,
       message: "Expected '#{given}' #{proposition} #{matcher_property}"
   end
 
+  @doc false
   def raise_error(given, proposition, matcher_property, actual) do
     raise Expect.AssertionError,
       message: "Expected '#{given}' #{proposition} #{matcher_property} '#{inspect(actual)}'"

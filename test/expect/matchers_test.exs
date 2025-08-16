@@ -25,6 +25,10 @@ defmodule Expect.MatchersTest do
     assert_raise AssertionError, "Expected '[1, 2, 3]' to equal '[4, 5, 6]'", fn ->
       expect([1, 2, 3], to: be_equal_to([4, 5, 6]))
     end
+
+    assert_raise AssertionError, "Expected ':ok' to equal 'nil'", fn ->
+      expect(:ok, to: be_equal_to(nil))
+    end
   end
 
   describe "to_contain matcher" do
