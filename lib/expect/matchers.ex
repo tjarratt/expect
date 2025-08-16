@@ -64,8 +64,8 @@ defmodule Expect.Matchers do
     {"contain", value, fn given -> value in given end}
   end
 
-  @spec be_empty() :: t()
   @doc "Verifies that `expected` is an empty list, map, or tuple"
+  @spec be_empty() :: t()
   def be_empty() do
     {"be empty", nil, &empty?/1}
   end
