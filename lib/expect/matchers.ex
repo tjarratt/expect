@@ -84,20 +84,23 @@ defmodule Expect.Matchers do
   end
 
   @doc "Matches `expected` against the provided regular expression using `Regex.match?`"
-  def to_match_regex(expected, regex) do
-    if Regex.match?(regex, expected.given) do
-      expected
-    else
-      raise_error("Expected '#{inspect(expected.given)}' to match regex '#{inspect(regex)}'")
-    end
+  @spec match_regex(Regex.t()) :: t()
+  def match_regex(regex) do
+    {"match regex", regex, fn given -> Regex.match?(regex, given) end}
   end
 
   @doc "Verifies that `expected` is a falsy value -- either `nil` or `false`"
-  def to_be_truthy(%Expect.WrappedValue{given: falsy}) when is_nil(falsy) or falsy === false do
-    raise_error("Expected '#{inspect(falsy)}' to be truthy")
+  @spec be_truthy() :: t()
+  def be_truthy() do
+    {"be truthy", nil,
+     fn given ->
+       case given do
+         nil -> false
+         false -> false
+         _ -> true
+       end
+     end}
   end
-
-  def to_be_truthy(otherwise), do: otherwise
 
   @doc "Verifies that `expected` is nil"
   @spec to_be_nil(Expect.WrappedValue.t()) :: Expect.WrappedValue.t()

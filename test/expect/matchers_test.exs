@@ -50,10 +50,10 @@ defmodule Expect.MatchersTest do
   end
 
   test "to_match_regex matcher" do
-    expect("hello") |> to_match_regex(~r[^h])
+    expect("hello", to: match_regex(~r[^h]))
 
     assert_raise AssertionError, "Expected '\"hello world\"' to match regex '~r/NOPE/'", fn ->
-      expect("hello world") |> to_match_regex(~r[NOPE])
+      expect("hello world", to: match_regex(~r[NOPE]))
     end
   end
 
@@ -88,15 +88,15 @@ defmodule Expect.MatchersTest do
   end
 
   test "to_be_truthy matcher" do
-    expect(true) |> to_be_truthy()
-    expect("anything besides literal nil or false") |> to_be_truthy()
+    expect(true, to: be_truthy())
+    expect("anything besides literal nil or false", to: be_truthy())
 
     assert_raise AssertionError, "Expected 'nil' to be truthy", fn ->
-      expect(nil) |> to_be_truthy()
+      expect(nil, to: be_truthy())
     end
 
     assert_raise AssertionError, "Expected 'false' to be truthy", fn ->
-      expect(false) |> to_be_truthy()
+      expect(false, to: be_truthy())
     end
   end
 
