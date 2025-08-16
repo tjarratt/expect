@@ -37,7 +37,7 @@ defmodule Expect do
           %Expect.WrappedValue{given: unquote(given)}
         end
 
-      [to_match: actual] ->
+      [to: {:pattern_match, _where, [actual]}] ->
         given_as_string = Macro.to_string(given)
         actual_as_string = Macro.to_string(actual)
 

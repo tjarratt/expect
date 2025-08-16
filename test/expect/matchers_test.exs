@@ -128,23 +128,25 @@ defmodule Expect.MatchersTest do
 
   describe "to_match matcher" do
     test "can pattern match maps, lists, tuples, and structs" do
-      expect(%{hello: _whom}, to_match: %{hello: "world"})
+      expect(%{hello: _whom}, to: pattern_match(%{hello: "world"}))
     end
 
     test "shows an informative error when the pattern match fails" do
       assert_raise AssertionError,
                    ~s[Expected '%{hello: "whoopsie"}' to match pattern '%{hello: "world"}', but it did not.],
-                   fn -> expect(%{hello: "whoopsie"}, to_match: %{hello: "world"}) end
+                   fn -> expect(%{hello: "whoopsie"}, to: pattern_match(%{hello: "world"})) end
 
       assert_raise AssertionError,
                    ~s[Expected '%{goodbye: _cruel_world}' to match pattern '%{hello: "world"}', but it did not.],
-                   fn -> expect(%{goodbye: _cruel_world}, to_match: %{hello: "world"}) end
+                   fn ->
+                     expect(%{goodbye: _cruel_world}, to: pattern_match(%{hello: "world"}))
+                   end
 
       wont_match = %{hello: "world"}
 
       assert_raise AssertionError,
                    ~s[Expected '%{goodbye: _cruel_world}' to match pattern 'wont_match', but it did not.],
-                   fn -> expect(%{goodbye: _cruel_world}, to_match: wont_match) end
+                   fn -> expect(%{goodbye: _cruel_world}, to: pattern_match(wont_match)) end
     end
   end
 end

@@ -139,6 +139,10 @@ defmodule Expect.Matchers do
   defp verify_length(_bad_input, expected_length) do
     {:error, "have length #{expected_length}, but it is neither a list nor a string"}
   end
+
+  defmacro pattern_match(expected) do
+    {:pattern_match, expected}
+  end
 end
 
 defmodule Expect.AssertionError do
