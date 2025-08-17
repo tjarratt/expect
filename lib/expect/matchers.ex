@@ -1,5 +1,6 @@
 defmodule Expect.Matchers do
   # @related [tests](test/expect/matchers_test.exs)
+  # @related [tests with warnings](test_with_warnings/expect/matchers/warnings_test.exs)
 
   @moduledoc """
     A matcher is responsible for providing `expect/2` three things
