@@ -8,26 +8,26 @@ defmodule Expect.MatchersTest do
   import Expect.Matchers
 
   test "equals matcher" do
-    expect(true, to: be_equal_to(true))
-    expect(1234, to: be_equal_to(1234))
-    expect("ok", to: be_equal_to("ok"))
-    expect(:ok, to: be_equal_to(:ok))
-    expect(1, to: be_equal_to(1.0))
+    expect(true, to: equal(true))
+    expect(1234, to: equal(1234))
+    expect("ok", to: equal("ok"))
+    expect(:ok, to: equal(:ok))
+    expect(1, to: equal(1.0))
 
     assert_raise AssertionError, "Expected 'true' to equal 'false'", fn ->
-      expect(true, to: be_equal_to(false))
+      expect(true, to: equal(false))
     end
 
     assert_raise AssertionError, "Expected '1' to strictly equal '1.0'", fn ->
-      expect(1, to: be_equal_to(1.0, :strict))
+      expect(1, to: equal(1.0, :strict))
     end
 
     assert_raise AssertionError, "Expected '[1, 2, 3]' to equal '[4, 5, 6]'", fn ->
-      expect([1, 2, 3], to: be_equal_to([4, 5, 6]))
+      expect([1, 2, 3], to: equal([4, 5, 6]))
     end
 
     assert_raise AssertionError, "Expected ':ok' to equal 'nil'", fn ->
-      expect(:ok, to: be_equal_to(nil))
+      expect(:ok, to: equal(nil))
     end
   end
 

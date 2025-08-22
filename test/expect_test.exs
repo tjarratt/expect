@@ -21,25 +21,25 @@ defmodule ExpectTest do
     end
 
     test "can test for positive conditions" do
-      expect(true, to: be_equal_to(true))
+      expect(true, to: equal(true))
 
       assert_raise AssertionError, "Expected 'false' to equal 'true'", fn ->
-        expect(false, to: be_equal_to(true))
+        expect(false, to: equal(true))
       end
     end
 
     test "can test for negative conditions" do
-      expect(true, to_not: be_equal_to(false))
+      expect(true, to_not: equal(false))
 
       assert_raise AssertionError, "Expected 'false' to not equal 'false'", fn ->
-        expect(false, to_not: be_equal_to(false))
+        expect(false, to_not: equal(false))
       end
     end
   end
 
   # # #
 
-  defp be_equal_to(expected_value) do
+  defp equal(expected_value) do
     {"equal", expected_value, fn given -> given == expected_value end}
   end
 end

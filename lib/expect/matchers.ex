@@ -74,14 +74,14 @@ defmodule Expect.Matchers do
 
   `expect(1, to: equal(1.0, strict: true))`
   """
-  @spec be_equal_to(any(), Keyword.t()) :: t()
-  def be_equal_to(value, opts \\ [])
+  @spec equal(any(), Keyword.t()) :: t()
+  def equal(value, opts \\ [])
 
-  def be_equal_to(value, :strict) do
+  def equal(value, :strict) do
     {"strictly equal", value, fn given -> given === value end}
   end
 
-  def be_equal_to(value, _opts) do
+  def equal(value, _opts) do
     {"equal", value, fn given -> given == value end}
   end
 
