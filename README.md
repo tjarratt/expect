@@ -12,7 +12,7 @@ Instead of writing the following...
 
 you can write...
 
-`expect(name) |> to_equal("Douglas Adams")`
+`expect(name, to: be_equal_to("Douglas Adams"))`
 
 See the documentation on `Expect.Matchers` for more examples of matchers to use.
 
@@ -30,24 +30,37 @@ end
 
 ## Custom Matchers
 
-Feel free to implement your own custom matchers. They have a fairly simple interface.
-At a bare minimum they should receive a single positional argument that will be a struct
-with a `given` field. This is the value that is wrapped by the `expect` function.
+You are highly encouraged to implement your own custom matchers. For the application you
+will build, there will surely be some interesting properties and shapes of data that
+will be important to verify. It might be easy to use the `be_equal_to` matcher for 99%
+of assertions, but writing a higher-level matcher can be much more intent revealing.
 
-Imagine we wanted to implement a `is_bananas()` matcher. It could look like this
+Imagine we wanted to implement a `be_bananas()` matcher. It could look like this
 
 ```elixir
 defmodule MyFancyMatchers do
-    def is_bananas(%{given: given}) do
-        cond given do
-            "bananas" -> given
-            "BANANAS" -> given
-            "🍌" -> given
-            _ -> raise AssertionError, message: "Expected '#{inspect(given)}' to be bananas, but it clearly was not."
-        end
+    def be_bananas() do
+       {
+            "be bananas",
+            Expect.Matchers.without_any_value(),
+            fn given ->
+                case given do
+                    "bananas" -> true
+                    "BANANAS" -> true
+                    _ -> false
+                end
+            end
+       }
     end
 end
+
+import Expect
+import MyFancyMatchers
+
+expect("🍌", to: be_bananas())
 ```
+
+For more details see the documentation for `Expect.Matchers`.
 
 ## Docs
 
