@@ -62,6 +62,38 @@ expect("🍌", to: be_bananas())
 
 For more details see the documentation for `Expect.Matchers`.
 
+## Available Matchers
+
+Expect ships with quite a few built-in matchers for you to use in tests
+
+* equal (eg: `==)
+* strictly equal (eg: `===`)
+* contain element inside a list
+* match regular expression
+* be empty
+* be truthy
+* be nil
+* have length
+* match pattern
+
+## Roadmap
+
+Here's a non-exhaustive list of features that are in our roadmap
+
+* be_in_range matcher
+* greater_than, less_than matchers
+* be equivalent `Date`, `Datetime` matchers
+* be temporally (eg: a date should be greater than, or less than another)
+* string matching (have prefix, have suffix, contain substring)
+* match yaml, json, or xml
+* contain elements with/without strict ordering
+* be element of some data structure
+* be struct of a given type
+* have key present in map
+* satisfy all, satisfy any, satisfy
+
+Many of these can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers)
+
 ## Docs
 
 <https://hexdocs.pm/expect>.
