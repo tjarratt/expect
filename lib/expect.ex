@@ -14,7 +14,7 @@ defmodule Expect do
 
     you can write...
 
-    `expect(name) |> to_equal("Douglas Adams")`
+    `expect(name, to: equal("Douglas Adams"))`
 
     See the documentation on `Expect.Matchers` for more examples of matchers to use.
   """
@@ -24,10 +24,12 @@ defmodule Expect do
 
     Example:
 
-    expect(42) |> to_equal(42)
+    ```
+    expect(42, to: equal(42))
 
     # raises an error
-    expect(42) |> to_equal("the answer to life, the universe, and everything")
+    expect(42, to: equal("the answer to life, the universe, and everything"))
+    ```
   """
 
   defmacro expect(given, args \\ []) do

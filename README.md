@@ -12,7 +12,7 @@ Instead of writing the following...
 
 you can write...
 
-`expect(name, to: be_equal_to("Douglas Adams"))`
+`expect(name, to: equal("Douglas Adams"))`
 
 See the documentation on `Expect.Matchers` for more examples of matchers to use.
 
@@ -32,14 +32,21 @@ end
 
 You are highly encouraged to implement your own custom matchers. For the application you
 will build, there will surely be some interesting properties and shapes of data that
-will be important to verify. It might be easy to use the `be_equal_to` matcher for 99%
+will be important to verify. It might be easy to use the `equal()` matcher for 99%
 of assertions, but writing a higher-level matcher can be much more intent revealing.
 
-Imagine we wanted to implement a `be_bananas()` matcher. It could look like this
+Imagine we are building an application that provides users with the highest quality
+bananas that money can buy. As part of our unit testing, it's crucial that we can
+verify that the output of our system is indeed a banana. It would be valuable to
+implement a `be_bananas()` matcher, as depending on the market the user is in
+the type of banana we supply them will vary (maybe they prefer it more or less ripe). 
+
+A simple version of our custom bananas matcher could look like this
 
 ```elixir
 defmodule MyFancyMatchers do
     def be_bananas() do
+        # should return a tuple of {matcher_name, any(), fn any() -> bool}
        {
             "be bananas",
             Expect.Matchers.without_any_value(),
@@ -47,6 +54,8 @@ defmodule MyFancyMatchers do
                 case given do
                     "bananas" -> true
                     "BANANAS" -> true
+                    "🍌" ->      true
+
                     _ -> false
                 end
             end
@@ -74,7 +83,7 @@ Expect ships with quite a few built-in matchers for you to use in tests
 * be truthy
 * be nil
 * have length
-* match pattern
+* match pattern (eg: `assert %{key: value} = %{key: "value"}`)
 
 ## Roadmap
 
