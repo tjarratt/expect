@@ -1,6 +1,8 @@
 defmodule Expect do
   # @related [test](test/expect_test.exs)
 
+  alias Expect.ProgrammerError
+
   @moduledoc """
     `Expect` allows you to write simple, clear assertions in your unit tests.
 
@@ -31,8 +33,23 @@ defmodule Expect do
     expect(42, to: equal("the answer to life, the universe, and everything"))
     ```
   """
+  defmacro expect(given, args \\ [])
 
-  defmacro expect(given, args \\ []) do
+  defmacro expect(_given, args) when length(args) > 1 do
+    quote do
+      raise ProgrammerError,
+        message: """
+        expect/2 should only be called with one arg, but you provided #{length(unquote(args))} :: #{inspect(Keyword.keys(unquote(args)))}
+
+        To fix this : call expect with either to: or to_not
+
+        eg: expect(some_list, to: have(length(3))
+        or: expect("success", to_not: regex(~r[whoopsie]))
+        """
+    end
+  end
+
+  defmacro expect(given, args) do
     case args do
       [] ->
         quote do
@@ -122,4 +139,9 @@ defmodule Expect do
     raise Expect.AssertionError,
       message: "Expected '#{given}' #{proposition} #{matcher_property} '#{inspect(actual)}'"
   end
+end
+
+defmodule Expect.ProgrammerError do
+  @moduledoc false
+  defexception [:message]
 end

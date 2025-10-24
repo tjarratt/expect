@@ -3,10 +3,11 @@ defmodule ExpectTest do
   use ExUnit.Case, async: true
 
   alias Expect.AssertionError
+  alias Expect.ProgrammerError
 
   import Expect
 
-  describe "using the expect/1 function" do
+  describe "using the expect/2 function" do
     test "works if you pass it built-in types" do
       assert expect(nil)
       assert expect(true)
@@ -34,6 +35,18 @@ defmodule ExpectTest do
       assert_raise AssertionError, "Expected 'false' to not equal 'false'", fn ->
         expect(false, to_not: equal(false))
       end
+    end
+  end
+
+  describe "calling expect/2 with too many arguments" do
+    test "raises a meaningful error so you know not to do that again" do
+      error =
+        assert_raise ProgrammerError, fn ->
+          expect(false, to: equal("whoops"), to_not: equal("oh no i accidentally all the args"))
+        end
+
+      assert error.message =~
+               "expect/2 should only be called with one arg, but you provided 2 :: [:to, :to_not]"
     end
   end
 
