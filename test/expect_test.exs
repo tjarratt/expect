@@ -9,16 +9,16 @@ defmodule ExpectTest do
 
   describe "using the expect/2 function" do
     test "works if you pass it built-in types" do
-      assert expect(nil)
-      assert expect(true)
-      assert expect(1)
-      assert expect(1.0)
-      assert expect("yup")
-      assert expect([1, 2, 3])
-      assert expect(<<123>>)
-      assert expect(%{key: "value"})
-      assert expect({1, 2, 3})
-      assert expect(~c'charstring')
+      assert expect(nil, to: equal(nil))
+      assert expect(true, to: equal(true))
+      assert expect(1, to: equal(1))
+      assert expect(1.0, to: equal(1.0))
+      assert expect("yup", to: equal("yup"))
+      assert expect([1, 2, 3], to: equal([1, 2, 3]))
+      assert expect(<<123>>, to: equal(<<123>>))
+      assert expect(%{key: "value"}, to: equal(%{key: "value"}))
+      assert expect({1, 2, 3}, to: equal({1, 2, 3}))
+      assert expect(~c'charstring', to: equal(~c'charstring'))
     end
 
     test "can test for positive conditions" do
@@ -38,8 +38,8 @@ defmodule ExpectTest do
     end
   end
 
-  describe "calling expect/2 with too many arguments" do
-    test "raises a meaningful error so you know not to do that again" do
+  describe "calling expect/2 with bad arguments" do
+    test "with too many args; raises a meaningful error so you know not to do that again" do
       error =
         assert_raise ProgrammerError, fn ->
           expect(false, to: equal("whoops"), to_not: equal("oh no i accidentally all the args"))
@@ -47,6 +47,15 @@ defmodule ExpectTest do
 
       assert error.message =~
                "expect/2 should only be called with one arg, but you provided 2 :: [:to, :to_not]"
+    end
+
+    test "with too few args; raises an error so you know your test has no side effect" do
+      error =
+        assert_raise ProgrammerError, fn ->
+          expect("whoops")
+        end
+
+      assert error.message =~ "expect/2 should only be called with one arg, but you provided none"
     end
   end
 

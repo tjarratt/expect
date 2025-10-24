@@ -49,6 +49,21 @@ defmodule Expect do
     end
   end
 
+  defmacro expect(_given, args) when length(args) == 0 do
+    quote do
+      raise ProgrammerError,
+        message: """
+          expect/2 should only be called with one arg, but you provided none.
+
+           To fix this : call expect with either to: or to_not
+
+          eg: expect(some_list, to: have(length(3))
+          or: expect("success", to_not: regex(~r[whoopsie]))
+
+        """
+    end
+  end
+
   defmacro expect(given, args) do
     case args do
       [] ->
