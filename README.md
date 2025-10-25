@@ -45,12 +45,12 @@ A simple version of our custom bananas matcher could look like this
 
 ```elixir
 defmodule MyFancyMatchers do
+    alias Expect.Matchers.CustomMatcher
+
     def be_bananas() do
-        # should return a tuple of {matcher_name, any(), fn any() -> bool}
-       {
-            "be bananas",
-            Expect.Matchers.without_any_value(),
-            fn given ->
+       %CustomMatcher{
+            name: "be bananas",
+            fn: fn given ->
                 case given do
                     "bananas" -> true
                     "BANANAS" -> true
