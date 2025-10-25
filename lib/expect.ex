@@ -59,7 +59,17 @@ defmodule Expect do
 
           eg: expect(some_list, to: have(length(3))
           or: expect("success", to_not: regex(~r[whoopsie]))
+        """
+    end
+  end
 
+  @known_propositions [:to, :to_not]
+
+  defmacro expect(_given, [{key, _value}]) when key not in @known_propositions do
+    quote do
+      raise ProgrammerError,
+        message: """
+        expect/2 should only be called with :to or :to_not, but you provided :#{unquote(key)}
         """
     end
   end

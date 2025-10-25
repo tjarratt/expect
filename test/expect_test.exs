@@ -57,6 +57,16 @@ defmodule ExpectTest do
 
       assert error.message =~ "expect/2 should only be called with one arg, but you provided none"
     end
+
+    test "with unknown args; raises an error so you know you done goofed" do
+      error =
+        assert_raise ProgrammerError, fn ->
+          expect("whoops", holy_carp: "sixte-tuberously")
+        end
+
+      assert error.message =~
+               "expect/2 should only be called with :to or :to_not, but you provided :holy_carp"
+    end
   end
 
   # # #
