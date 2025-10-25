@@ -2,6 +2,7 @@ defmodule Expect do
   # @related [test](test/expect_test.exs)
 
   alias Expect.ProgrammerError
+  alias Expect.Matchers.CustomMatcher
 
   @moduledoc """
     `Expect` allows you to write simple, clear assertions in your unit tests.
@@ -117,7 +118,7 @@ defmodule Expect do
         given_as_string = Macro.to_string(given)
 
         quote do
-          {condition, actual, matcher} = unquote(matcher_args)
+          %CustomMatcher{name: condition, actual: actual, fn: matcher} = unquote(matcher_args)
 
           case matcher.(unquote(given)) do
             true ->
@@ -136,7 +137,7 @@ defmodule Expect do
         given_as_string = Macro.to_string(given)
 
         quote do
-          {condition, actual, matcher} = unquote(matcher_args)
+          %CustomMatcher{name: condition, actual: actual, fn: matcher} = unquote(matcher_args)
 
           case matcher.(unquote(given)) do
             false ->

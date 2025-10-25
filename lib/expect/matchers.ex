@@ -2,6 +2,8 @@ defmodule Expect.Matchers do
   # @related [tests](test/expect/matchers_test.exs)
   # @related [tests with warnings](test_with_warnings/expect/matchers/warnings_test.exs)
 
+  alias Expect.Matchers.CustomMatcher
+
   @moduledoc """
     A matcher is responsible for providing `expect/2` three things
 
@@ -9,10 +11,10 @@ defmodule Expect.Matchers do
     2. the value that was matched against (optional)
     3. a function to invoke with the given value to `expect()`
 
-    Expect will invoke the function, and if it fails to match as expected, it will
-    construct an error message using the name and the value.
+    Expect will invoke the matcher's function, and if it returns `false` or an error tuple, it will
+    construct an error message using the name and the value, and fail the test.
 
-    For example, given a matcher that returns `{"end with", "cool", fn given -> String.ends_with?(given, "cool") end}`,
+    For example, given a matcher that returns `%CustomMatcher{name: "end with", actual: "cool", fn: fn given -> String.ends_with?(given, "cool") end}`,
     we could expect the following result
 
     ```
@@ -20,7 +22,7 @@ defmodule Expect.Matchers do
     # raises an error with message "Expected '"literal fire"' to end with '"cool"', but it did not"
     ```
 
-    Alternatively, a matcher that returns `{"be greater than", 5, fn given -> given > 5 end}`
+    Alternatively, a matcher that returns `%CustomMatcher{name: "be greater than", actual: 5, fn: fn given -> given > 5 end}`
     would have the following result
 
     ```
@@ -32,7 +34,7 @@ defmodule Expect.Matchers do
 
     By default, when a matcher fails, the error message will use the name of the matcher, and the value matched against.
 
-    eg: given a matcher returns `{"start with", "gravy", fn given -> String.starts_with?(given, "gravy") end}`
+    eg: given a matcher returns `%CustomMatcher{name: "start with", actual: "gravy", fn: fn given -> String.starts_with?(given, "gravy") end}`
     we could expect the following line to fail
 
     ```
@@ -40,10 +42,11 @@ defmodule Expect.Matchers do
     # fails with message "Expected '\"groovy train\"' to start with '\"gravy\"'"
     ```
 
-    If you are writing a matcher that doesn't compare the given value against something else, you can do the following
+    If you are writing a matcher that doesn't compare the given value against something else, you can omit the `actual` key
+    (only the `name` and `fn` keys are required)
 
     ```
-    def start_with_a, do: {"start with the letter 'a'", Expect.Matchers.without_any_value(), fn given -> String.starts_with?(given, "A") end}`
+    def start_with_a, do: %CustomMatcher{name: "start with the letter 'A'", fn: fn given -> String.starts_with?(given, "A") end}`
 
     expect("algebra", to: start_with_a())
     # passes
@@ -59,13 +62,17 @@ defmodule Expect.Matchers do
     handled by returning an error tuple from a matcher
 
     ```
-    def end_with(suffix) do: {"end with", suffix, &verify_suffix(&1, suffix)}
+    def end_with(suffix) do: %CustomMatcher{name: "end with", actual: suffix, fn: &verify_suffix(&1, suffix)}
 
     defp verify_suffix(given, suffix) when is_binary(given), do: String.ends_with?(given, suffix)
     defp verify_suffix(given, suffix), do: {:error, "end with '#\{suffix}', but it was not a string"}
     ```
   """
-  @type t :: {matcher_name :: String.t(), matched_against :: any(), (given :: any() -> bool())}
+  @type t :: %CustomMatcher{
+          name: matcher_name :: String.t(),
+          actual: matched_against :: any(),
+          fn: (given :: any() -> bool())
+        }
 
   @doc """
   Verifies that `expected` is equal to `value`, using `==`.
@@ -78,11 +85,11 @@ defmodule Expect.Matchers do
   def equal(value, opts \\ [])
 
   def equal(value, :strict) do
-    {"strictly equal", value, fn given -> given === value end}
+    %CustomMatcher{name: "strictly equal", actual: value, fn: fn given -> given === value end}
   end
 
   def equal(value, _opts) do
-    {"equal", value, fn given -> given == value end}
+    %CustomMatcher{name: "equal", actual: value, fn: fn given -> given == value end}
   end
 
   @doc """
@@ -95,17 +102,21 @@ defmodule Expect.Matchers do
   @spec contain(any()) :: t()
   @spec contain(only: any()) :: t()
   def contain(only: one_value) do
-    {"only contain", one_value, fn given -> given == [one_value] end}
+    %CustomMatcher{
+      name: "only contain",
+      actual: one_value,
+      fn: fn given -> given == [one_value] end
+    }
   end
 
   def contain(value) do
-    {"contain", value, fn given -> value in given end}
+    %CustomMatcher{name: "contain", actual: value, fn: fn given -> value in given end}
   end
 
   @doc "Verifies that `expected` is an empty list, map, or tuple"
   @spec be_empty() :: t()
   def be_empty() do
-    {"be empty", without_any_value(), &empty?/1}
+    %CustomMatcher{name: "be empty", fn: &empty?/1}
   end
 
   defp empty?([]), do: true
@@ -124,36 +135,48 @@ defmodule Expect.Matchers do
   @doc "Matches `expected` against the provided regular expression using `Regex.match?`"
   @spec match_regex(Regex.t()) :: t()
   def match_regex(regex) do
-    {"match regex", regex, fn given -> Regex.match?(regex, given) end}
+    %CustomMatcher{
+      name: "match regex",
+      actual: regex,
+      fn: fn given -> Regex.match?(regex, given) end
+    }
   end
 
   @doc "Verifies that `expected` is a falsy value -- either `nil` or `false`"
   @spec be_truthy() :: t()
   def be_truthy() do
-    {"be truthy", without_any_value(),
-     fn given ->
-       case given do
-         nil -> false
-         false -> false
-         _ -> true
-       end
-     end}
+    %CustomMatcher{
+      name: "be truthy",
+      fn: fn given ->
+        case given do
+          nil -> false
+          false -> false
+          _ -> true
+        end
+      end
+    }
   end
 
   @doc "Verifies that `expected` is nil"
   @spec be_nil() :: t()
   def be_nil() do
-    {"be nil", without_any_value(),
-     fn
-       nil -> true
-       _otherwise -> false
-     end}
+    %CustomMatcher{
+      name: "be nil",
+      fn: fn
+        nil -> true
+        _otherwise -> false
+      end
+    }
   end
 
   @doc "Verifies that `expected` is either a List or String with the given length"
   @spec have_length(non_neg_integer()) :: t()
   def have_length(expected_length) do
-    {"have length", expected_length, &verify_length(&1, expected_length)}
+    %CustomMatcher{
+      name: "have length",
+      actual: expected_length,
+      fn: &verify_length(&1, expected_length)
+    }
   end
 
   defp verify_length(list, expected_length)
@@ -200,12 +223,6 @@ defmodule Expect.Matchers do
   defmacro pattern_match(expected) do
     {:pattern_match, expected}
   end
-
-  # # # Support for custom matchers
-  @doc false
-  defmodule NoValue, do: defstruct([])
-
-  def without_any_value(), do: %Expect.Matchers.NoValue{}
 end
 
 defmodule Expect.AssertionError do
