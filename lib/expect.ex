@@ -50,7 +50,7 @@ defmodule Expect do
     end
   end
 
-  defmacro expect(_given, args) when length(args) == 0 do
+  defmacro expect(_given, args) when args == [] do
     quote do
       raise ProgrammerError,
         message: """
@@ -75,13 +75,9 @@ defmodule Expect do
     end
   end
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defmacro expect(given, args) do
     case args do
-      [] ->
-        quote do
-          %Expect.WrappedValue{given: unquote(given)}
-        end
-
       [to: {:pattern_match, _where, [actual]}] ->
         given_as_string = Macro.to_string(given)
         actual_as_string = Macro.to_string(actual)
@@ -91,6 +87,7 @@ defmodule Expect do
             unquote(given) = unquote(actual)
           rescue
             MatchError ->
+              # credo:disable-for-next-line Credo.Check.Warning.RaiseInsideRescue
               raise Expect.AssertionError,
                 message:
                   "Expected '#{unquote(given_as_string)}' to match pattern '#{unquote(actual_as_string)}', but it did not."

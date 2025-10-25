@@ -8,6 +8,7 @@ defmodule Expect.Matchers.NoValue do
 end
 
 defmodule Expect.Matchers.CustomMatcher do
+  @moduledoc false
   alias Expect.Matchers.NoValue
 
   @enforce_keys [:name, :fn]
