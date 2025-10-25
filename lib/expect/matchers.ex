@@ -14,7 +14,7 @@ defmodule Expect.Matchers do
     Expect will invoke the matcher's function, and if it returns `false` or an error tuple, it will
     construct an error message using the name and the value, and fail the test.
 
-    For example, given a matcher that returns `%CustomMatcher{name: "end with", actual: "cool", fn: fn given -> String.ends_with?(given, "cool") end}`,
+    For example, given a matcher that returns `%CustomMatcher{name: "end with", expected: "cool", fn: fn given -> String.ends_with?(given, "cool") end}`,
     we could expect the following result
 
     ```
@@ -22,7 +22,7 @@ defmodule Expect.Matchers do
     # raises an error with message "Expected '"literal fire"' to end with '"cool"', but it did not"
     ```
 
-    Alternatively, a matcher that returns `%CustomMatcher{name: "be greater than", actual: 5, fn: fn given -> given > 5 end}`
+    Alternatively, a matcher that returns `%CustomMatcher{name: "be greater than", expected: 5, fn: fn given -> given > 5 end}`
     would have the following result
 
     ```
@@ -34,7 +34,7 @@ defmodule Expect.Matchers do
 
     By default, when a matcher fails, the error message will use the name of the matcher, and the value matched against.
 
-    eg: given a matcher returns `%CustomMatcher{name: "start with", actual: "gravy", fn: fn given -> String.starts_with?(given, "gravy") end}`
+    eg: given a matcher returns `%CustomMatcher{name: "start with", expected: "gravy", fn: fn given -> String.starts_with?(given, "gravy") end}`
     we could expect the following line to fail
 
     ```
@@ -62,7 +62,7 @@ defmodule Expect.Matchers do
     handled by returning an error tuple from a matcher
 
     ```
-    def end_with(suffix) do: %CustomMatcher{name: "end with", actual: suffix, fn: &verify_suffix(&1, suffix)}
+    def end_with(suffix) do: %CustomMatcher{name: "end with", expected: suffix, fn: &verify_suffix(&1, suffix)}
 
     defp verify_suffix(given, suffix) when is_binary(given), do: String.ends_with?(given, suffix)
     defp verify_suffix(given, suffix), do: {:error, "end with '#\{suffix}', but it was not a string"}
@@ -70,7 +70,7 @@ defmodule Expect.Matchers do
   """
   @type t :: %CustomMatcher{
           name: matcher_name :: String.t(),
-          actual: matched_against :: any(),
+          expected: matched_against :: any(),
           fn: (given :: any() -> bool())
         }
 
@@ -85,11 +85,11 @@ defmodule Expect.Matchers do
   def equal(value, opts \\ [])
 
   def equal(value, :strict) do
-    %CustomMatcher{name: "strictly equal", actual: value, fn: fn given -> given === value end}
+    %CustomMatcher{name: "strictly equal", expected: value, fn: fn given -> given === value end}
   end
 
   def equal(value, _opts) do
-    %CustomMatcher{name: "equal", actual: value, fn: fn given -> given == value end}
+    %CustomMatcher{name: "equal", expected: value, fn: fn given -> given == value end}
   end
 
   @doc """
@@ -104,13 +104,13 @@ defmodule Expect.Matchers do
   def contain(only: one_value) do
     %CustomMatcher{
       name: "only contain",
-      actual: one_value,
+      expected: one_value,
       fn: fn given -> given == [one_value] end
     }
   end
 
   def contain(value) do
-    %CustomMatcher{name: "contain", actual: value, fn: fn given -> value in given end}
+    %CustomMatcher{name: "contain", expected: value, fn: fn given -> value in given end}
   end
 
   @doc "Verifies that `expected` is an empty list, map, or tuple"
@@ -137,7 +137,7 @@ defmodule Expect.Matchers do
   def match_regex(regex) do
     %CustomMatcher{
       name: "match regex",
-      actual: regex,
+      expected: regex,
       fn: fn given -> Regex.match?(regex, given) end
     }
   end
@@ -174,7 +174,7 @@ defmodule Expect.Matchers do
   def have_length(expected_length) do
     %CustomMatcher{
       name: "have length",
-      actual: expected_length,
+      expected: expected_length,
       fn: &verify_length(&1, expected_length)
     }
   end

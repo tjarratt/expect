@@ -115,14 +115,14 @@ defmodule Expect do
         given_as_string = Macro.to_string(given)
 
         quote do
-          %CustomMatcher{name: condition, actual: actual, fn: matcher} = unquote(matcher_args)
+          %CustomMatcher{name: condition, expected: expected, fn: matcher} = unquote(matcher_args)
 
           case matcher.(unquote(given)) do
             true ->
               :ok
 
             false ->
-              raise_error(unquote(given_as_string), "to", condition, actual)
+              raise_error(unquote(given_as_string), "to", condition, expected)
 
             {:error, reason} ->
               raise Expect.AssertionError,
@@ -134,14 +134,14 @@ defmodule Expect do
         given_as_string = Macro.to_string(given)
 
         quote do
-          %CustomMatcher{name: condition, actual: actual, fn: matcher} = unquote(matcher_args)
+          %CustomMatcher{name: condition, expected: expecte, fn: matcher} = unquote(matcher_args)
 
           case matcher.(unquote(given)) do
             false ->
               :ok
 
             true ->
-              raise_error(unquote(given_as_string), "to not", condition, actual)
+              raise_error(unquote(given_as_string), "to not", condition, expecte)
 
             {:error, reason} ->
               raise Expect.AssertionError,
@@ -158,9 +158,9 @@ defmodule Expect do
   end
 
   @doc false
-  def raise_error(given, proposition, matcher_property, actual) do
+  def raise_error(given, proposition, matcher_property, expected) do
     raise Expect.AssertionError,
-      message: "Expected '#{given}' #{proposition} #{matcher_property} '#{inspect(actual)}'"
+      message: "Expected '#{given}' #{proposition} #{matcher_property} '#{inspect(expected)}'"
   end
 end
 

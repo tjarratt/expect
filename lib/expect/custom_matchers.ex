@@ -3,7 +3,7 @@ defmodule Expect.Matchers.NoValue do
   defstruct([])
 
   # # # Sentinel value to distinguish between two cases that are distinct but look similar
-  # scenario 1 : actual is `nil` because the value passed to `expect` is literally `nil`
+  # scenario 1 : expected is `nil` because the value passed to `expect` is literally `nil`
   # scenario 2 : the matcher does not receive an input that should be shown in the error message
 end
 
@@ -12,5 +12,5 @@ defmodule Expect.Matchers.CustomMatcher do
   alias Expect.Matchers.NoValue
 
   @enforce_keys [:name, :fn]
-  defstruct name: nil, actual: %NoValue{}, fn: nil
+  defstruct name: nil, expected: %NoValue{}, fn: nil
 end

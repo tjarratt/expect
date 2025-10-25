@@ -74,7 +74,7 @@ defmodule ExpectTest do
   defp equal(expected_value) do
     %Expect.Matchers.CustomMatcher{
       name: "equal",
-      actual: expected_value,
+      expected: expected_value,
       fn: fn given -> given == expected_value end
     }
   end
