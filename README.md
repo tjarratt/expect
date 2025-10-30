@@ -75,7 +75,7 @@ For more details see the documentation for `Expect.Matchers`.
 
 Expect ships with quite a few built-in matchers for you to use in tests
 
-* equal (eg: `==)
+* equal (eg: `==`)
 * strictly equal (eg: `===`)
 * contain element inside a list
 * match regular expression
@@ -91,8 +91,8 @@ Here's a non-exhaustive list of features that are in our roadmap
 
 * be_in_range matcher
 * greater_than, less_than matchers
-* be equivalent `Date`, `Datetime` matchers
-* be temporally (eg: a date should be greater than, or less than another)
+* be_equivalent `Date`, `Datetime` matchers
+* be_temporally (eg: a date should be greater than, or less than another)
 * string matching (have prefix, have suffix, contain substring)
 * match yaml, json, or xml
 * contain elements with/without strict ordering
