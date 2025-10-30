@@ -10,6 +10,7 @@ defmodule Expect.MixProject do
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      docs: docs(),
       name: "Expect",
       description: "Write beautifully simple assertions for ExUnit using matchers",
       package: package(),
@@ -48,6 +49,13 @@ defmodule Expect.MixProject do
       licenses: ["MIT"],
       links: %{"GitHub" => @github_url},
       maintainers: ["Tim Jarratt"]
+    ]
+  end
+
+  defp docs() do
+    [
+      main: "readme",
+      extras: ["README.md"]
     ]
   end
 end
