@@ -7,5 +7,9 @@ erl_crash.dump
 *.ez
 *.beam
 /config/*.secret.exs
-.elixir_ls/
 .DS_Store
+result
+
+# language servers
+.elixir_ls/
+.expert
