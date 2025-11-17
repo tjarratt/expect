@@ -58,7 +58,8 @@ defmodule Expect.MixProject do
   defp docs() do
     [
       main: "readme",
-      extras: ["README.md"]
+      extras: ["CHANGELOG.md", {:"README.md", [title: "Overview"]}],
+      source_url: @github_url
     ]
   end
 end

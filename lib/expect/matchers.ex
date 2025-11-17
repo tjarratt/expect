@@ -5,67 +5,67 @@ defmodule Expect.Matchers do
   alias Expect.Matchers.CustomMatcher
 
   @moduledoc """
-    A matcher is responsible for providing `expect/2` three things
+  A matcher is responsible for providing `expect/2` three things
 
-    1. the name for the matcher
-    2. the value that was matched against (optional)
-    3. a function to invoke with the given value to `expect()`
+  1. the name for the matcher
+  2. the value that was matched against (optional)
+  3. a function to invoke with the given value to `expect()`
 
-    Expect will invoke the matcher's function, and if it returns `false` or an error tuple, it will
-    construct an error message using the name and the value, and fail the test.
+  Expect will invoke the matcher's function, and if it returns `false` or an error tuple, it will
+  construct an error message using the name and the value, and fail the test.
 
-    For example, given a matcher that returns `%CustomMatcher{name: "end with", expected: "cool", fn: fn given -> String.ends_with?(given, "cool") end}`,
-    we could expect the following result
+  For example, given a matcher that returns `%CustomMatcher{name: "end with", expected: "cool", fn: fn given -> String.ends_with?(given, "cool") end}`,
+  we could expect the following result
 
-    ```
-    expect("literal fire", to: end_with("cool"))
-    # raises an error with message "Expected '"literal fire"' to end with '"cool"', but it did not"
-    ```
+  ```
+  expect("literal fire", to: end_with("cool"))
+  # raises an error with message "Expected '"literal fire"' to end with '"cool"', but it did not"
+  ```
 
-    Alternatively, a matcher that returns `%CustomMatcher{name: "be greater than", expected: 5, fn: fn given -> given > 5 end}`
-    would have the following result
+  Alternatively, a matcher that returns `%CustomMatcher{name: "be greater than", expected: 5, fn: fn given -> given > 5 end}`
+  would have the following result
 
-    ```
-    expect(0, to: be_greater_than(5))
-    # raises an error with message "Expected '0' to be greater than '5'"
-    ```
+  ```
+  expect(0, to: be_greater_than(5))
+  # raises an error with message "Expected '0' to be greater than '5'"
+  ```
 
-    # Custom failure messages
+  ## Custom Failure Messages
 
-    By default, when a matcher fails, the error message will use the name of the matcher, and the value matched against.
+  By default, when a matcher fails, the error message will use the name of the matcher, and the value matched against.
 
-    eg: given a matcher returns `%CustomMatcher{name: "start with", expected: "gravy", fn: fn given -> String.starts_with?(given, "gravy") end}`
-    we could expect the following line to fail
+  eg: given a matcher returns `%CustomMatcher{name: "start with", expected: "gravy", fn: fn given -> String.starts_with?(given, "gravy") end}`
+  we could expect the following line to fail
 
-    ```
-    expect("groovy train", to: start_with("gravy"))
-    # fails with message "Expected '\"groovy train\"' to start with '\"gravy\"'"
-    ```
+  ```
+  expect("groovy train", to: start_with("gravy"))
+  # fails with message "Expected '\"groovy train\"' to start with '\"gravy\"'"
+  ```
 
-    If you are writing a matcher that doesn't compare the given value against something else, you can omit the `actual` key
-    (only the `name` and `fn` keys are required)
+  If you are writing a matcher that doesn't compare the given value against something else, you can omit the `actual` key
+  (only the `name` and `fn` keys are required)
 
-    ```
-    def start_with_a, do: %CustomMatcher{name: "start with the letter 'A'", fn: fn given -> String.starts_with?(given, "A") end}`
+  ```
+  def start_with_a, do: %CustomMatcher{name: "start with the letter 'A'", fn: fn given -> String.starts_with?(given, "A") end}`
 
-    expect("algebra", to: start_with_a())
-    # passes
+  expect("algebra", to: start_with_a())
+  # passes
 
-    expect("monotonic", to: start_with_a())
-    # fails with message "Expected '"monotonic"' to start with the letter 'a'"
-    ```
+  expect("monotonic", to: start_with_a())
+  # fails with message "Expected '"monotonic"' to start with the letter 'a'"
+  ```
 
-    # Custom error messages
+  ## Custom error messages
 
-    Sometimes, a matcher might receive input that it is incapable of dealing with. A matcher that wants to
-    verify if a string has a certain prefix would be unable to handle input that is not a string. This can be
-    handled by returning an error tuple from a matcher
+  Sometimes, a matcher might receive input that it is incapable of dealing with. A matcher that wants to
+  verify if a string has a certain prefix would be unable to handle input that is not a string. This can be
+  handled by returning an error tuple from a matcher
 
-    ```
-    def end_with(suffix) do: %CustomMatcher{name: "end with", expected: suffix, fn: &verify_suffix(&1, suffix)}
+  ```
+  def end_with(suffix) do: %CustomMatcher{name: "end with", expected: suffix, fn: &verify_suffix(&1, suffix)}
 
-    defp verify_suffix(given, suffix) when is_binary(given), do: String.ends_with?(given, suffix)
-    defp verify_suffix(given, suffix), do: {:error, "end with '#\{suffix}', but it was not a string"}
+  defp verify_suffix(given, suffix) when is_binary(given), do: String.ends_with?(given, suffix)
+  defp verify_suffix(given, suffix), do: {:error, "end with '#\{suffix}', but it was not a string"}
     ```
   """
   @type t :: %CustomMatcher{
