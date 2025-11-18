@@ -75,79 +75,78 @@ defmodule Expect do
     end
   end
 
-  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-  defmacro expect(given, args) do
-    case args do
-      [to: {:pattern_match, _where, [actual]}] ->
-        given_as_string = Macro.to_string(given)
-        actual_as_string = Macro.to_string(actual)
+  defmacro expect(given, to: {:pattern_match, _where, [actual]}) do
+    given_as_string = Macro.to_string(given)
+    actual_as_string = Macro.to_string(actual)
 
-        quote do
-          try do
-            unquote(given) = unquote(actual)
-          rescue
-            MatchError ->
-              # credo:disable-for-next-line Credo.Check.Warning.RaiseInsideRescue
-              raise Expect.AssertionError,
-                message:
-                  "Expected '#{unquote(given_as_string)}' to match pattern '#{unquote(actual_as_string)}', but it did not."
-          end
-        end
+    quote do
+      try do
+        unquote(given) = unquote(actual)
+      rescue
+        MatchError ->
+          # credo:disable-for-next-line Credo.Check.Warning.RaiseInsideRescue
+          raise Expect.AssertionError,
+            message:
+              "Expected '#{unquote(given_as_string)}' to match pattern '#{unquote(actual_as_string)}', but it did not."
+      end
+    end
+  end
 
-      [to_not: {:pattern_match, _where, [actual]}] ->
-        given_as_string = Macro.to_string(given)
-        actual_as_string = Macro.to_string(actual)
+  defmacro expect(given, to_not: {:pattern_match, _where, [actual]}) do
+    given_as_string = Macro.to_string(given)
+    actual_as_string = Macro.to_string(actual)
 
-        quote do
-          try do
-            unquote(given) = unquote(actual)
+    quote do
+      try do
+        unquote(given) = unquote(actual)
 
-            raise Expect.AssertionError,
-              message:
-                "Expected '#{unquote(given_as_string)}' to not match pattern '#{unquote(actual_as_string)}', but it did."
-          rescue
-            MatchError ->
-              :ok
-          end
-        end
+        raise Expect.AssertionError,
+          message:
+            "Expected '#{unquote(given_as_string)}' to not match pattern '#{unquote(actual_as_string)}', but it did."
+      rescue
+        MatchError ->
+          :ok
+      end
+    end
+  end
 
-      [to: matcher_args] ->
-        given_as_string = Macro.to_string(given)
+  defmacro expect(given, to: matcher_args) do
+    given_as_string = Macro.to_string(given)
 
-        quote do
-          %CustomMatcher{name: condition, expected: expected, fn: matcher} = unquote(matcher_args)
+    quote do
+      %CustomMatcher{name: condition, expected: expected, fn: matcher} = unquote(matcher_args)
 
-          case matcher.(unquote(given)) do
-            true ->
-              :ok
+      case matcher.(unquote(given)) do
+        true ->
+          :ok
 
-            false ->
-              raise_error(unquote(given_as_string), "to", condition, expected)
+        false ->
+          raise_error(unquote(given_as_string), "to", condition, expected)
 
-            {:error, reason} ->
-              raise Expect.AssertionError,
-                message: "Expected '#{unquote(given_as_string)}' to #{reason}"
-          end
-        end
+        {:error, reason} ->
+          raise Expect.AssertionError,
+            message: "Expected '#{unquote(given_as_string)}' to #{reason}"
+      end
+    end
+  end
 
-      [to_not: matcher_args] ->
-        given_as_string = Macro.to_string(given)
+  defmacro expect(given, to_not: matcher_args) do
+    given_as_string = Macro.to_string(given)
 
-        quote do
-          %CustomMatcher{name: condition, expected: expecte, fn: matcher} = unquote(matcher_args)
+    quote do
+      %CustomMatcher{name: condition, expected: expecte, fn: matcher} = unquote(matcher_args)
 
-          case matcher.(unquote(given)) do
-            false ->
-              :ok
+      case matcher.(unquote(given)) do
+        false ->
+          :ok
 
-            true ->
-              raise_error(unquote(given_as_string), "to not", condition, expecte)
+        true ->
+          raise_error(unquote(given_as_string), "to not", condition, expecte)
 
-            {:error, reason} ->
-              raise Expect.AssertionError,
-                message: "Expected '#{unquote(given_as_string)}' to not #{reason}"
-          end
-        end
+        {:error, reason} ->
+          raise Expect.AssertionError,
+            message: "Expected '#{unquote(given_as_string)}' to not #{reason}"
+      end
     end
   end
 
