@@ -37,6 +37,7 @@ defmodule Expect.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, ">= 0.0.0", only: :dev, runtime: false},
       {:sobelow, ">= 0.0.0", only: :dev, runtime: false},
+      {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
