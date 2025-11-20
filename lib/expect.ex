@@ -89,6 +89,10 @@ defmodule Expect do
             message:
               "Expected '#{unquote(given_as_string)}' to match pattern '#{unquote(actual_as_string)}', but it did not."
       end
+
+      # perform the pattern match ONE MORE TIME
+      # this allows for the variables bound given to be used later in the test
+      unquote(given) = unquote(actual)
     end
   end
 

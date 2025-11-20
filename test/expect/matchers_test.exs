@@ -133,6 +133,9 @@ defmodule Expect.MatchersTest do
   describe "pattern_match matcher" do
     test "can pattern match maps, lists, tuples, and structs" do
       expect(%{hello: _whom}, to: pattern_match(%{hello: "world"}))
+      expect([_, _, _], to: pattern_match([1, 2, 3]))
+      expect({_a, _b}, to: pattern_match({:a, :b}))
+      expect(%{year: 1999}, to: pattern_match(%Date{year: 1999, month: 12, day: 31}))
     end
 
     test "shows an informative error when the pattern match fails" do
