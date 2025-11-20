@@ -219,6 +219,19 @@ defmodule Expect.Matchers do
     whoops = :ok
     expect(whoops, to: pattern_match(:error))
     ```
+
+    ## Binding variables
+
+    You can bind variables during a pattern match and use that for later assertions.
+    This is frequently helpful when you have some large data structure and assert several
+    distinct facts about it
+
+    ```
+    my_data = %{large: %{structure: %{containing: %{a_list: ["cool"]}}}}
+
+    expect(%{large: %{structure: %{containing: %{a_list: list}}}}, to: pattern_match(my_data))
+    expect(list, to: contain("cool"))
+    ```
   """
   defmacro pattern_match(expected) do
     {:pattern_match, expected}

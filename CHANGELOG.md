@@ -1,4 +1,21 @@
-Changelog for v1.x
+# Changelog
+
+## v.21
+
+### Enhancement
+
+* variables bound with `pattern_match/1` are available for later assertions (see docs for `pattern_match/1` for more info)
+
+## v2.0
+
+### Enhancement
+
+* Implementing custom matchers can be done using the `CustomMatcher` struct
+* `expect/2` raises when provided incorrect arguments
+
+### Breaking changes
+
+* the previous tuple-based API for custom matchers is no longer supported
 
 ## v1.0
 
