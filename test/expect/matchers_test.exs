@@ -1,11 +1,9 @@
 defmodule Expect.MatchersTest do
   # @related [subject](lib/expect/matchers.ex)
   use ExUnit.Case, async: true
+  use Expect
 
   alias Expect.AssertionError
-
-  import Expect
-  import Expect.Matchers
 
   test "equals matcher" do
     expect(true, to: equal(true))

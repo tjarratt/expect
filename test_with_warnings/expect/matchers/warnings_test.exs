@@ -1,11 +1,9 @@
 defmodule Expect.Matchers.RaisesWarningsTest do
   # @related [subject](lib/expect/matchers.ex)
   use ExUnit.Case, async: true
+  use Expect
 
   alias Expect.AssertionError
-
-  import Expect
-  import Expect.Matchers
 
   describe "pattern_match matcher" do
     test "can verify a given value does not pattern match" do

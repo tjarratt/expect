@@ -18,7 +18,7 @@ defmodule Expect.Matchers.CustomMatcher do
   bananas that money can buy. As part of our unit testing, it's crucial that we can
   verify that the output of our system is indeed a banana. It would be valuable to
   implement a `be_bananas()` matcher, as depending on the market the user is in
-  the type of banana we supply them will vary (maybe they prefer it more or less ripe). 
+  the type of banana we supply them will vary (maybe they prefer it more or less ripe).
 
   A simple version of our custom bananas matcher could look like this
 
@@ -42,7 +42,7 @@ defmodule Expect.Matchers.CustomMatcher do
     end
   end
 
-  import Expect
+  use Expect
   import MyFancyMatchers
 
   expect("🍌", to: be_bananas())

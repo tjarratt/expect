@@ -12,7 +12,10 @@ Instead of writing the following...
 
 you can write...
 
-`expect(name, to: equal("Douglas Adams"))`
+```
+use Expect
+expect(name, to: equal("Douglas Adams"))
+```
 
 See the documentation on `Expect.Matchers` for more examples of matchers to use.
 
@@ -63,7 +66,7 @@ defmodule MyFancyMatchers do
     end
 end
 
-import Expect
+use Expect
 import MyFancyMatchers
 
 expect("🍌", to: be_bananas())

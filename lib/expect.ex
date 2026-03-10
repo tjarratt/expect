@@ -34,6 +34,14 @@ defmodule Expect do
     expect(42, to: equal("the answer to life, the universe, and everything"))
     ```
   """
+
+  defmacro __using__(_options) do
+    quote do
+      import Expect
+      import Expect.Matchers
+    end
+  end
+
   defmacro expect(given, args \\ [])
 
   defmacro expect(_given, args) when length(args) > 1 do
