@@ -83,6 +83,10 @@ defmodule Expect do
     end
   end
 
+  # pattern match is tricky to implement
+  # ideally this would be implemented as its own matcher
+  # but it's important that both the given and actual are unquoted
+  # here at the same time, otherwise we lose information
   defmacro expect(given, to: {:pattern_match, _where, [actual]}) do
     given_as_string = Macro.to_string(given)
     actual_as_string = Macro.to_string(actual)
