@@ -1,14 +1,24 @@
 # Changelog
 
-## v.21
+## 3.0
 
-### Enhancement
+### Enhancements
+* Suppress warnings from elixir 1.19 compiler
+
+### Breaking changes
+* Experimental : Custom Matcher interface is changing
+
+
+## v2.1
+
+### Enhancements
 
 * variables bound with `pattern_match/1` are available for later assertions (see docs for `pattern_match/1` for more info)
 
+
 ## v2.0
 
-### Enhancement
+### Enhancements
 
 * Implementing custom matchers can be done using the `CustomMatcher` struct
 * `expect/2` raises when provided incorrect arguments
@@ -16,6 +26,7 @@
 ### Breaking changes
 
 * the previous tuple-based API for custom matchers is no longer supported
+
 
 ## v1.0
 

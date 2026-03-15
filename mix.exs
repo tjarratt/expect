@@ -6,7 +6,7 @@ defmodule Expect.MixProject do
   def project do
     [
       app: :expect,
-      version: "2.2.0",
+      version: "3.0.0-rc",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
