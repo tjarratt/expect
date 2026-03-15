@@ -75,7 +75,25 @@ defmodule ExpectTest do
     %Expect.Matchers.CustomMatcher{
       name: "equal",
       expected: expected_value,
-      fn: fn given -> given == expected_value end
+      fn: fn given ->
+        # workaround elixir 1.19 compiler
+        # see lib/expect/matchers.ex
+        cond do
+          Process.get(:unused_key) == :never_gonna_give_you_up ->
+            %Expect.Matchers.ErrorResult{error: "Rickrolled AGAIN ???"}
+
+          Process.get(:unused_key) == :never_gonna_let_you_down ->
+            %Expect.Matchers.Result{succeeded?: true}
+
+          Process.get(:unused_key) == :never_gonna_run_around_and_desert_you ->
+            %Expect.Matchers.Result{succeeded?: false}
+
+          true ->
+            %Expect.Matchers.Result{
+              succeeded?: given == expected_value
+            }
+        end
+      end
     }
   end
 end

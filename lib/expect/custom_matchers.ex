@@ -25,18 +25,21 @@ defmodule Expect.Matchers.CustomMatcher do
   ```elixir
   defmodule MyFancyMatchers do
     alias Expect.Matchers.CustomMatcher
+    alias Expect.Matchers.Result
 
     def be_bananas() do
        %CustomMatcher{
             name: "be bananas",
-            fn: fn given ->
+            fn: fn given
+                when is_binary(given) ->
                 case given do
-                    "bananas" -> true
-                    "BANANAS" -> true
-                    "🍌" ->      true
-
-                    _ -> false
+                    "bananas" -> %Result{succeeded?: true}
+                    "BANANAS" -> %Result{succeeded?: true}
+                    "🍌" ->     %Result{succeeded?: true}
+                    _ -> %Result{succeeded?: true}
                 end
+                when not is_binary(given) ->
+                  %Result{errors: ["can only detect bananas in strings"]}
             end
        }
     end
@@ -47,6 +50,7 @@ defmodule Expect.Matchers.CustomMatcher do
 
   expect("🍌", to: be_bananas())
   ```
+
   """
 
   alias Expect.Matchers.NoValue

@@ -1,8 +1,28 @@
+defmodule Expect.Matchers.Result do
+  @moduledoc """
+  Custom matchers should return this in their happy path.
+  Use the `succeeded?` field to indicate whether its condition is true or false
+  """
+  defstruct succeeded?: false
+end
+
+defmodule Expect.Matchers.ErrorResult do
+  @moduledoc "Custom matchers should return this when they receive data they cannot handle"
+  defstruct error: nil
+end
+
+defmodule Expect.AssertionError do
+  @moduledoc false
+  defexception [:message]
+end
+
 defmodule Expect.Matchers do
   # @related [tests](test/expect/matchers_test.exs)
   # @related [tests with warnings](test_with_warnings/expect/matchers/warnings_test.exs)
 
   alias Expect.Matchers.CustomMatcher
+  alias Expect.Matchers.ErrorResult
+  alias Expect.Matchers.Result
 
   @moduledoc """
   A matcher is responsible for providing `expect/2` three things
@@ -71,7 +91,7 @@ defmodule Expect.Matchers do
   @type t :: %CustomMatcher{
           name: matcher_name :: String.t(),
           expected: matched_against :: any(),
-          fn: (given :: any() -> bool() | {:error, any()})
+          fn: (given :: any() -> %Result{} | %ErrorResult{})
         }
 
   @doc """
@@ -85,11 +105,19 @@ defmodule Expect.Matchers do
   def equal(value, opts \\ [])
 
   def equal(value, :strict) do
-    %CustomMatcher{name: "strictly equal", expected: value, fn: fn given -> given === value end}
+    %CustomMatcher{
+      name: "strictly equal",
+      expected: value,
+      fn: fn given -> never_fails_matcher(given === value) end
+    }
   end
 
   def equal(value, _opts) do
-    %CustomMatcher{name: "equal", expected: value, fn: fn given -> given == value end}
+    %CustomMatcher{
+      name: "equal",
+      expected: value,
+      fn: fn given -> never_fails_matcher(given == value) end
+    }
   end
 
   @doc """
@@ -105,12 +133,16 @@ defmodule Expect.Matchers do
     %CustomMatcher{
       name: "only contain",
       expected: one_value,
-      fn: fn given -> given == [one_value] end
+      fn: fn given -> never_fails_matcher(given == [one_value]) end
     }
   end
 
   def contain(value) do
-    %CustomMatcher{name: "contain", expected: value, fn: fn given -> value in given end}
+    %CustomMatcher{
+      name: "contain",
+      expected: value,
+      fn: fn given -> never_fails_matcher(value in given) end
+    }
   end
 
   @doc "Verifies that `expected` is an empty list, map, or tuple"
@@ -119,17 +151,19 @@ defmodule Expect.Matchers do
     %CustomMatcher{name: "be empty", fn: &empty?/1}
   end
 
-  defp empty?([]), do: true
-  defp empty?([_ | _rest] = _list), do: false
+  defp empty?([]), do: never_fails_matcher(true)
+  defp empty?([_ | _rest] = _list), do: never_fails_matcher(false)
 
-  defp empty?({}), do: true
-  defp empty?(tuple) when is_tuple(tuple), do: false
+  defp empty?({}), do: never_fails_matcher(true)
+  defp empty?(tuple) when is_tuple(tuple), do: never_fails_matcher(false)
 
-  defp empty?(map) when is_map(map) and map_size(map) == 0, do: true
-  defp empty?(map) when is_map(map), do: false
+  defp empty?(map) when is_map(map) and map_size(map) == 0, do: never_fails_matcher(true)
+  defp empty?(map) when is_map(map), do: never_fails_matcher(false)
 
   defp empty?(_otherwise) do
-    {:error, "be empty, but it's not a list, map, or tuple."}
+    %ErrorResult{
+      error: "be empty, but it's not a list, map, or tuple."
+    }
   end
 
   @doc "Matches `expected` against the provided regular expression using `Regex.match?`"
@@ -138,7 +172,7 @@ defmodule Expect.Matchers do
     %CustomMatcher{
       name: "match regex",
       expected: regex,
-      fn: fn given -> Regex.match?(regex, given) end
+      fn: fn given -> Regex.match?(regex, given) |> never_fails_matcher() end
     }
   end
 
@@ -153,6 +187,7 @@ defmodule Expect.Matchers do
           false -> false
           _ -> true
         end
+        |> never_fails_matcher()
       end
     }
   end
@@ -163,8 +198,8 @@ defmodule Expect.Matchers do
     %CustomMatcher{
       name: "be nil",
       fn: fn
-        nil -> true
-        _otherwise -> false
+        nil -> never_fails_matcher(true)
+        _otherwise -> never_fails_matcher(false)
       end
     }
   end
@@ -184,9 +219,9 @@ defmodule Expect.Matchers do
     actual_length = length(list)
 
     if actual_length == expected_length do
-      true
+      never_fails_matcher(true)
     else
-      {:error, "have length #{expected_length}, but it is actually #{actual_length}"}
+      %ErrorResult{error: "have length #{expected_length}, but it is actually #{actual_length}"}
     end
   end
 
@@ -194,11 +229,13 @@ defmodule Expect.Matchers do
        when is_binary(binary) do
     actual_length = String.length(binary)
 
-    actual_length == expected_length
+    (actual_length == expected_length) |> never_fails_matcher()
   end
 
   defp verify_length(_bad_input, expected_length) do
-    {:error, "have length #{expected_length}, but it is neither a list nor a string"}
+    %ErrorResult{
+      error: "have length #{expected_length}, but it is neither a list nor a string"
+    }
   end
 
   @doc """
@@ -236,9 +273,33 @@ defmodule Expect.Matchers do
   defmacro pattern_match(expected) do
     {:pattern_match, expected}
   end
-end
 
-defmodule Expect.AssertionError do
-  @moduledoc false
-  defexception [:message]
+  defp never_fails_matcher(successful?) when is_boolean(successful?) do
+    # workaround for elixir 1.19 compiler being TOO GOOD
+    # without this workaround, we get a lot of warnings because
+    # not all of the matchers are going to return all of the
+    # possible types that a matcher could return, to whit :
+    # - %Result{successful?: true}
+    # - %Result{successful?: false}
+    # - %ErrorResult{error: binary()}
+    #
+    # this ensures that each matcher has code paths that the compiler
+    # is not clever enough to realize will never execute, primarily
+    # because the return type of Process.get/1 is dynamic
+    #
+    # see jose's insights here : https://elixirforum.com/t/elixir-v1-18-0-rc-0-released/68015/31
+    cond do
+      Process.get(:unused_key) == :never_gonna_give_you_up ->
+        %ErrorResult{error: "Rickrolled AGAIN ???"}
+
+      Process.get(:unused_key) == :never_gonna_let_you_down ->
+        %Result{succeeded?: true}
+
+      Process.get(:unused_key) == :never_gonna_run_around_and_desert_you ->
+        %Result{succeeded?: false}
+
+      true ->
+        %Result{succeeded?: successful?}
+    end
+  end
 end

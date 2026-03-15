@@ -3,6 +3,8 @@ defmodule Expect do
 
   alias Expect.ProgrammerError
   alias Expect.Matchers.CustomMatcher
+  alias Expect.Matchers.ErrorResult
+  alias Expect.Matchers.Result
 
   @moduledoc """
     `Expect` allows you to write simple, clear assertions in your unit tests.
@@ -132,16 +134,18 @@ defmodule Expect do
     quote do
       %CustomMatcher{name: condition, expected: expected, fn: matcher} = unquote(matcher_args)
 
-      case matcher.(unquote(given)) do
-        true ->
+      result = matcher.(unquote(given))
+
+      case result do
+        %ErrorResult{error: error_message} ->
+          raise Expect.AssertionError,
+            message: "Expected '#{unquote(given_as_string)}' to #{error_message}"
+
+        %Result{succeeded?: true} ->
           :ok
 
-        false ->
+        %Result{succeeded?: false} ->
           raise_error(unquote(given_as_string), "to", condition, expected)
-
-        {:error, reason} ->
-          raise Expect.AssertionError,
-            message: "Expected '#{unquote(given_as_string)}' to #{reason}"
       end
     end
   end
@@ -152,16 +156,18 @@ defmodule Expect do
     quote do
       %CustomMatcher{name: condition, expected: expecte, fn: matcher} = unquote(matcher_args)
 
-      case matcher.(unquote(given)) do
-        false ->
+      result = matcher.(unquote(given))
+
+      case result do
+        %ErrorResult{error: error_message} ->
+          raise Expect.AssertionError,
+            message: "Expected '#{unquote(given_as_string)}' to not #{error_message}"
+
+        %Result{succeeded?: false} ->
           :ok
 
-        true ->
+        %Result{succeeded?: true} ->
           raise_error(unquote(given_as_string), "to not", condition, expecte)
-
-        {:error, reason} ->
-          raise Expect.AssertionError,
-            message: "Expected '#{unquote(given_as_string)}' to not #{reason}"
       end
     end
   end
