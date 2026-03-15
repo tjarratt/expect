@@ -20,8 +20,8 @@ defmodule Expect.MixProject do
     ]
   end
 
-  defp test_paths("true"), do: ["test", "test_with_warnings"]
-  defp test_paths(_), do: ["test"]
+  defp test_paths(nil), do: ["test"]
+  defp test_paths(_), do: ["test", "test_with_warnings"]
 
   def application do
     [
