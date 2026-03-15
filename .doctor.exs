@@ -1,5 +1,7 @@
 %Doctor.Config{
   ignore_modules: [
+    Expect.Matchers.Result,
+    Expect.Matchers.ErrorResult,
     Expect.Matchers.NoValue,
     Expect.Matchers.CustomMatcher
   ],
