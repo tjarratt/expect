@@ -39,7 +39,7 @@ defmodule Expect.Matchers.CustomMatcher do
                     _ -> %Result{succeeded?: true}
                 end
                 when not is_binary(given) ->
-                  %Result{errors: ["can only detect bananas in strings"]}
+                  %ErrorResult{error: "I can only detect bananas in binaries"}
             end
        }
     end
