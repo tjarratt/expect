@@ -162,7 +162,7 @@ defmodule Expect.Matchers do
 
   defp empty?(_otherwise) do
     %ErrorResult{
-      error: "be empty, but it's not a list, map, or tuple."
+      error: "it's not a list, map, or tuple."
     }
   end
 
@@ -208,7 +208,7 @@ defmodule Expect.Matchers do
   @spec have_length(non_neg_integer()) :: t()
   def have_length(expected_length) do
     %CustomMatcher{
-      name: "have length",
+      name: "have length #{expected_length}",
       expected: expected_length,
       fn: &verify_length(&1, expected_length)
     }
@@ -221,7 +221,7 @@ defmodule Expect.Matchers do
     if actual_length == expected_length do
       never_fails_matcher(true)
     else
-      %ErrorResult{error: "have length #{expected_length}, but it is actually #{actual_length}"}
+      %ErrorResult{error: "it is actually #{actual_length}"}
     end
   end
 
@@ -232,9 +232,9 @@ defmodule Expect.Matchers do
     (actual_length == expected_length) |> never_fails_matcher()
   end
 
-  defp verify_length(_bad_input, expected_length) do
+  defp verify_length(_bad_input, _expected_length) do
     %ErrorResult{
-      error: "have length #{expected_length}, but it is neither a list nor a string"
+      error: "it is neither a list nor a string"
     }
   end
 

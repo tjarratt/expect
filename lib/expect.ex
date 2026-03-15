@@ -139,8 +139,8 @@ defmodule Expect do
       case result do
         %ErrorResult{error: error_message} ->
           raise Expect.AssertionError,
-            # TODO: we can pull the matcher name into this message !!!
-            message: "Expected '#{unquote(given_as_string)}' to #{error_message}"
+            message:
+              "Expected '#{unquote(given_as_string)}' to #{matcher_name}, but #{error_message}"
 
         %Result{succeeded?: true} ->
           :ok
@@ -155,21 +155,21 @@ defmodule Expect do
     given_as_string = Macro.to_string(given)
 
     quote do
-      %CustomMatcher{name: matcher_name, expected: expecte, fn: matcher} = unquote(matcher_args)
+      %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
 
       result = matcher.(unquote(given))
 
       case result do
         %ErrorResult{error: error_message} ->
           raise Expect.AssertionError,
-            # TODO: we can pull the matcher name into this message !!!
-            message: "Expected '#{unquote(given_as_string)}' to not #{error_message}"
+            message:
+              "Expected '#{unquote(given_as_string)}' to not #{matcher_name}, but #{error_message}"
 
         %Result{succeeded?: false} ->
           :ok
 
         %Result{succeeded?: true} ->
-          raise_error(unquote(given_as_string), "to not", matcher_name, expecte)
+          raise_error(unquote(given_as_string), "to not", matcher_name, expected)
       end
     end
   end
