@@ -89,6 +89,8 @@ defmodule Expect do
   # ideally this would be implemented as its own matcher
   # but it's important that both the given and actual are unquoted
   # here at the same time, otherwise we lose information
+  #
+  # as far as I can tell, this is the only way we could implement such a matcher
   defmacro expect(given, to: {:pattern_match, _where, [actual]}) do
     given_as_string = Macro.to_string(given)
     actual_as_string = Macro.to_string(actual)
@@ -173,6 +175,8 @@ defmodule Expect do
       end
     end
   end
+
+  # # # Interal, intended to be private but left public so macros can refer to them
 
   @doc false
   def raise_error(given, proposition, matcher_property, %Expect.Matchers.NoValue{}) do
