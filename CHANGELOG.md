@@ -4,6 +4,7 @@
 
 ### Enhancements
 * Suppress warnings from elixir 1.19 compiler
+* When a match fails, print the value of the variables instead of "expected 'my_var' to equal 'some_other_var'"
 
 ### Breaking changes
 * Experimental : Custom Matcher interface is changing
