@@ -24,7 +24,7 @@ defmodule ExpectTest do
     test "can test for positive conditions" do
       expect(true, to: equal(true))
 
-      assert_raise AssertionError, "Expected 'false' to equal 'true'", fn ->
+      assert_raise AssertionError, "Expected false to equal true", fn ->
         expect(false, to: equal(true))
       end
     end
@@ -32,8 +32,24 @@ defmodule ExpectTest do
     test "can test for negative conditions" do
       expect(true, to_not: equal(false))
 
-      assert_raise AssertionError, "Expected 'false' to not equal 'false'", fn ->
+      assert_raise AssertionError, "Expected false to not equal false", fn ->
         expect(false, to_not: equal(false))
+      end
+    end
+
+    test "prints the literal value of the given and actual when the matcher fails" do
+      given = "def"
+      actual = "abc"
+
+      assert_raise AssertionError, ~s[Expected "abc" to equal "def"], fn ->
+        expect(actual, to: equal(given))
+      end
+
+      actual = "xyz"
+      given = "xyz"
+
+      assert_raise AssertionError, ~s[Expected "xyz" to not equal "xyz"], fn ->
+        expect(actual, to_not: equal(given))
       end
     end
   end

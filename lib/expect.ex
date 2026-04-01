@@ -93,7 +93,6 @@ defmodule Expect do
   # as far as I can tell, this is the only way we could implement such a matcher
   defmacro expect(given, to: {:pattern_match, _where, [actual]}) do
     given_as_string = Macro.to_string(given)
-    actual_as_string = Macro.to_string(actual)
 
     quote do
       try do
@@ -103,7 +102,7 @@ defmodule Expect do
           # credo:disable-for-next-line Credo.Check.Warning.RaiseInsideRescue
           raise Expect.AssertionError,
             message:
-              "Expected '#{unquote(given_as_string)}' to match pattern '#{unquote(actual_as_string)}', but it did not."
+              "Expected #{unquote(given_as_string)} to match pattern #{unquote(actual) |> inspect()}, but it did not."
       end
 
       # perform the pattern match ONE MORE TIME
@@ -114,7 +113,6 @@ defmodule Expect do
 
   defmacro expect(given, to_not: {:pattern_match, _where, [actual]}) do
     given_as_string = Macro.to_string(given)
-    actual_as_string = Macro.to_string(actual)
 
     quote do
       try do
@@ -122,7 +120,7 @@ defmodule Expect do
 
         raise Expect.AssertionError,
           message:
-            "Expected '#{unquote(given_as_string)}' to not match pattern '#{unquote(actual_as_string)}', but it did."
+            "Expected #{unquote(given_as_string)} to not match pattern #{unquote(actual) |> inspect()}, but it did."
       rescue
         MatchError ->
           :ok
@@ -131,8 +129,6 @@ defmodule Expect do
   end
 
   defmacro expect(given, to: matcher_args) do
-    given_as_string = Macro.to_string(given)
-
     quote do
       %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
 
@@ -142,20 +138,18 @@ defmodule Expect do
         %ErrorResult{error: error_message} ->
           raise Expect.AssertionError,
             message:
-              "Expected '#{unquote(given_as_string)}' to #{matcher_name}, but #{error_message}"
+              "Expected #{unquote(given) |> inspect()} to #{matcher_name}, but #{error_message}"
 
         %Result{succeeded?: true} ->
           :ok
 
         %Result{succeeded?: false} ->
-          raise_error(unquote(given_as_string), "to", matcher_name, expected)
+          raise_error(unquote(given) |> inspect(), "to", matcher_name, expected)
       end
     end
   end
 
   defmacro expect(given, to_not: matcher_args) do
-    given_as_string = Macro.to_string(given)
-
     quote do
       %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
 
@@ -165,13 +159,13 @@ defmodule Expect do
         %ErrorResult{error: error_message} ->
           raise Expect.AssertionError,
             message:
-              "Expected '#{unquote(given_as_string)}' to not #{matcher_name}, but #{error_message}"
+              "Expected #{unquote(given) |> inspect()} to not #{matcher_name}, but #{error_message}"
 
         %Result{succeeded?: false} ->
           :ok
 
         %Result{succeeded?: true} ->
-          raise_error(unquote(given_as_string), "to not", matcher_name, expected)
+          raise_error(unquote(given) |> inspect, "to not", matcher_name, expected)
       end
     end
   end
@@ -181,13 +175,13 @@ defmodule Expect do
   @doc false
   def raise_error(given, proposition, matcher_property, %Expect.Matchers.NoValue{}) do
     raise Expect.AssertionError,
-      message: "Expected '#{given}' #{proposition} #{matcher_property}"
+      message: "Expected #{given} #{proposition} #{matcher_property}"
   end
 
   @doc false
   def raise_error(given, proposition, matcher_property, expected) do
     raise Expect.AssertionError,
-      message: "Expected '#{given}' #{proposition} #{matcher_property} '#{inspect(expected)}'"
+      message: "Expected #{given} #{proposition} #{matcher_property} #{inspect(expected)}"
   end
 end
 
