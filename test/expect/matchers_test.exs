@@ -98,7 +98,11 @@ defmodule Expect.MatchersTest do
       end
     end
 
-    test "verifies that the value is the only one present" do
+    test "works with ranges" do
+      expect(1..10, to: contain(1))
+    end
+
+    test "can verify that the value is the only one present" do
       expect([1], to: contain(only: 1))
 
       # nb: keyword lists are actually just syntactic sugar for a list of tuples of size 2 {:key, value}
