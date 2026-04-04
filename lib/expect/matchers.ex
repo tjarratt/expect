@@ -145,6 +145,30 @@ defmodule Expect.Matchers do
   end
 
   @doc """
+  Verifies that `expected` is strictly less than `value`, using `<`.
+  """
+  def be_less_than(value) do
+    %CustomMatcher{
+      name: "be less than #{inspect(value)}",
+      expected: value,
+      fn: &verify_less_than(&1, value)
+    }
+  end
+
+  defp verify_less_than(lhs, rhs)
+       when (is_integer(lhs) or is_float(lhs)) and (is_integer(lhs) or is_float(lhs)) do
+    if lhs < rhs do
+      never_fails_matcher(true)
+    else
+      %ErrorResult{error: "it wasn't"}
+    end
+  end
+
+  defp verify_less_than(_lhs, _rhs) do
+    %ErrorResult{error: "matcher expects only integers or floats"}
+  end
+
+  @doc """
   Verifies that the provided `value` is in the list `expected`
 
   If you want to verify that the list ONLY contains the one value then use `:only`

@@ -5,7 +5,7 @@ defmodule Expect.MatchersTest do
 
   alias Expect.AssertionError
 
-  test "equals matcher" do
+  test "equal matcher" do
     expect(true, to: equal(true))
     expect(1234, to: equal(1234))
     expect("ok", to: equal("ok"))
@@ -29,7 +29,7 @@ defmodule Expect.MatchersTest do
     end
   end
 
-  test "greater than matcher" do
+  test "be greater than matcher" do
     expect(2, to: be_greater_than(1))
     expect(2.0, to: be_greater_than(1.0))
 
@@ -50,6 +50,30 @@ defmodule Expect.MatchersTest do
                  ~s[Expected "abc" to be greater than "def", but matcher expects only integers or floats],
                  fn ->
                    expect("abc", to: be_greater_than("def"))
+                 end
+  end
+
+  test "be less than matcher" do
+    expect(1, to: be_less_than(2))
+    expect(1.0, to: be_less_than(2.0))
+
+    expect(1, to: be_less_than(2.0))
+    expect(1.0, to: be_less_than(2))
+
+    assert_raise AssertionError, "Expected 2 to be less than 1, but it wasn't", fn ->
+      expect(2, to: be_less_than(1))
+    end
+
+    assert_raise AssertionError,
+                 "Expected nil to be less than 2, but matcher expects only integers or floats",
+                 fn ->
+                   expect(nil, to: be_less_than(2))
+                 end
+
+    assert_raise AssertionError,
+                 ~s[Expected "abc" to be less than "def", but matcher expects only integers or floats],
+                 fn ->
+                   expect("abc", to: be_less_than("def"))
                  end
   end
 
