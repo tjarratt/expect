@@ -89,17 +89,28 @@ defmodule Expect.MatchersTest do
                  end
   end
 
+  test "be in range matcher" do
+    expect(1, to: be_in_range(1..10))
+
+    assert_raise AssertionError, ~s[Expected 0 to be in range 1..2, but it was not], fn ->
+      expect(0, to: be_in_range(1..2))
+    end
+
+    assert_raise AssertionError,
+                 ~s[Expected "wat" to be in range 1..2, but "wat" is not an integer],
+                 fn -> expect("wat", to: be_in_range(1..2)) end
+  end
+
   describe "to_contain matcher" do
-    test "verifies that the value is in the list" do
+    test "verifies that the value is in the enum" do
       expect([1, 2, 3], to: contain(1))
+      expect(1..10, to: contain(1))
+      expect([player: 1], to: contain({:player, 1}))
+      expect(%{name: "bob"}, to: contain({:name, "bob"}))
 
       assert_raise AssertionError, "Expected [1, 2, 3] to contain \"bananas\"", fn ->
         expect([1, 2, 3], to: contain("bananas"))
       end
-    end
-
-    test "works with ranges" do
-      expect(1..10, to: contain(1))
     end
 
     test "can verify that the value is the only one present" do

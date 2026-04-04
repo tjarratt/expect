@@ -195,6 +195,31 @@ defmodule Expect.Matchers do
     }
   end
 
+  @spec be_in_range(Range.t()) :: t()
+  def be_in_range(range) do
+    %CustomMatcher{
+      name: "be in range #{inspect(range)}",
+      expected: range,
+      fn: fn given -> verify_in_range(range, given) end
+    }
+  end
+
+  defp verify_in_range(range, given) when is_integer(given) do
+    if given in range do
+      never_fails_matcher(true)
+    else
+      %ErrorResult{
+        error: "it was not"
+      }
+    end
+  end
+
+  defp verify_in_range(_range, given) do
+    %ErrorResult{
+      error: "#{inspect(given)} is not an integer"
+    }
+  end
+
   @doc "Verifies that `expected` is an empty list, map, or tuple"
   @spec be_empty() :: t()
   def be_empty() do
