@@ -8,13 +8,20 @@ and allow you to write tests that more clearly reveal their intent.
 
 Instead of writing the following...
 
-`assert name == "Douglas Adams"`
+```
+subject = %Author{name: "Douglas Adams", answer: 42}
+
+assert subject.name == "Douglas Adams"
+assert subject.answer == 42
+```
 
 you can write...
 
 ```
 use Expect
-expect(name, to: equal("Douglas Adams"))
+
+expect(subject.name, to: equal("Douglas Adams"))
+expect(subject.answer, to: be_the_answer_to_life_the_universe_and_everything_else())
 ```
 
 See the documentation on `Expect.Matchers` for more examples of matchers to use.
