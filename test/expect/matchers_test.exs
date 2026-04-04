@@ -29,6 +29,30 @@ defmodule Expect.MatchersTest do
     end
   end
 
+  test "greater than matcher" do
+    expect(2, to: be_greater_than(1))
+    expect(2.0, to: be_greater_than(1.0))
+
+    expect(2, to: be_greater_than(1.0))
+    expect(2.0, to: be_greater_than(1))
+
+    assert_raise AssertionError, "Expected 1 to be greater than 2, but it wasn't", fn ->
+      expect(1, to: be_greater_than(2))
+    end
+
+    assert_raise AssertionError,
+                 "Expected nil to be greater than 2, but matcher expects only integers or floats",
+                 fn ->
+                   expect(nil, to: be_greater_than(2))
+                 end
+
+    assert_raise AssertionError,
+                 ~s[Expected "abc" to be greater than "def", but matcher expects only integers or floats],
+                 fn ->
+                   expect("abc", to: be_greater_than("def"))
+                 end
+  end
+
   describe "to_contain matcher" do
     test "verifies that the value is in the list" do
       expect([1, 2, 3], to: contain(1))
@@ -110,7 +134,7 @@ defmodule Expect.MatchersTest do
     end
   end
 
-  test "length matcher" do
+  test "have_length matcher" do
     expect([], to: have_length(0))
     expect([:madness], to: have_length(1))
     expect([hello: :world], to: have_length(1))
