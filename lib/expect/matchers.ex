@@ -106,16 +106,14 @@ defmodule Expect.Matchers do
 
   def equal(value, :strict) do
     %CustomMatcher{
-      name: "strictly equal",
-      expected: value,
+      name: "strictly equal #{inspect(value)}",
       fn: fn given -> never_fails_matcher(given === value) end
     }
   end
 
   def equal(value, _opts) do
     %CustomMatcher{
-      name: "equal",
-      expected: value,
+      name: "equal #{inspect(value)}",
       fn: fn given -> never_fails_matcher(given == value) end
     }
   end
@@ -126,18 +124,13 @@ defmodule Expect.Matchers do
   def be_greater_than(value) do
     %CustomMatcher{
       name: "be greater than #{inspect(value)}",
-      expected: value,
       fn: &verify_greater_than(&1, value)
     }
   end
 
   defp verify_greater_than(lhs, rhs)
        when (is_integer(lhs) or is_float(lhs)) and (is_integer(rhs) or is_float(rhs)) do
-    if lhs > rhs do
-      never_fails_matcher(true)
-    else
-      %ErrorResult{error: "it wasn't"}
-    end
+    never_fails_matcher(lhs > rhs)
   end
 
   defp verify_greater_than(_lhs, _rhs) do
@@ -150,18 +143,13 @@ defmodule Expect.Matchers do
   def be_less_than(value) do
     %CustomMatcher{
       name: "be less than #{inspect(value)}",
-      expected: value,
       fn: &verify_less_than(&1, value)
     }
   end
 
   defp verify_less_than(lhs, rhs)
        when (is_integer(lhs) or is_float(lhs)) and (is_integer(rhs) or is_float(rhs)) do
-    if lhs < rhs do
-      never_fails_matcher(true)
-    else
-      %ErrorResult{error: "it wasn't"}
-    end
+    never_fails_matcher(lhs < rhs)
   end
 
   defp verify_less_than(_lhs, _rhs) do
@@ -181,16 +169,14 @@ defmodule Expect.Matchers do
   @spec contain(only: any()) :: t()
   def contain(only: one_value) do
     %CustomMatcher{
-      name: "only contain",
-      expected: one_value,
+      name: "only contain #{inspect(one_value)}",
       fn: fn given -> never_fails_matcher(given == [one_value]) end
     }
   end
 
   def contain(value) do
     %CustomMatcher{
-      name: "contain",
-      expected: value,
+      name: "contain #{inspect(value)}",
       fn: fn given -> never_fails_matcher(value in given) end
     }
   end
@@ -199,19 +185,12 @@ defmodule Expect.Matchers do
   def be_in_range(range) do
     %CustomMatcher{
       name: "be in range #{inspect(range)}",
-      expected: range,
       fn: fn given -> verify_in_range(range, given) end
     }
   end
 
   defp verify_in_range(range, given) when is_integer(given) do
-    if given in range do
-      never_fails_matcher(true)
-    else
-      %ErrorResult{
-        error: "it was not"
-      }
-    end
+    never_fails_matcher(given in range)
   end
 
   defp verify_in_range(_range, given) do
@@ -245,8 +224,7 @@ defmodule Expect.Matchers do
   @spec match_regex(Regex.t()) :: t()
   def match_regex(regex) do
     %CustomMatcher{
-      name: "match regex",
-      expected: regex,
+      name: "match regex #{inspect(regex)}",
       fn: fn given -> Regex.match?(regex, given) |> never_fails_matcher() end
     }
   end
@@ -284,7 +262,6 @@ defmodule Expect.Matchers do
   def have_length(expected_length) do
     %CustomMatcher{
       name: "have length #{expected_length}",
-      expected: expected_length,
       fn: &verify_length(&1, expected_length)
     }
   end
@@ -293,11 +270,7 @@ defmodule Expect.Matchers do
        when is_list(list) and is_integer(expected_length) do
     actual_length = length(list)
 
-    if actual_length == expected_length do
-      never_fails_matcher(true)
-    else
-      %ErrorResult{error: "it is actually #{actual_length}"}
-    end
+    never_fails_matcher(actual_length == expected_length)
   end
 
   defp verify_length(binary, expected_length)

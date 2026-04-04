@@ -11,9 +11,14 @@ defmodule Expect.MatchersTest do
     expect("ok", to: equal("ok"))
     expect(:ok, to: equal(:ok))
     expect(1, to: equal(1.0))
+    expect(1, to_not: equal(0))
 
     assert_raise AssertionError, "Expected true to equal false", fn ->
       expect(true, to: equal(false))
+    end
+
+    assert_raise AssertionError, "Expected 1 to not equal 1", fn ->
+      expect(1, to_not: equal(1))
     end
 
     assert_raise AssertionError, "Expected 1 to strictly equal 1.0", fn ->
@@ -36,7 +41,9 @@ defmodule Expect.MatchersTest do
     expect(2, to: be_greater_than(1.0))
     expect(2.0, to: be_greater_than(1))
 
-    assert_raise AssertionError, "Expected 1 to be greater than 2, but it wasn't", fn ->
+    expect(1, to_not: be_greater_than(2))
+
+    assert_raise AssertionError, "Expected 1 to be greater than 2", fn ->
       expect(1, to: be_greater_than(2))
     end
 
@@ -66,7 +73,9 @@ defmodule Expect.MatchersTest do
     expect(1, to: be_less_than(2.0))
     expect(1.0, to: be_less_than(2))
 
-    assert_raise AssertionError, "Expected 2 to be less than 1, but it wasn't", fn ->
+    expect(1, to_not: be_less_than(0))
+
+    assert_raise AssertionError, "Expected 2 to be less than 1", fn ->
       expect(2, to: be_less_than(1))
     end
 
@@ -91,9 +100,14 @@ defmodule Expect.MatchersTest do
 
   test "be in range matcher" do
     expect(1, to: be_in_range(1..10))
+    expect(0, to_not: be_in_range(1..10))
 
-    assert_raise AssertionError, ~s[Expected 0 to be in range 1..2, but it was not], fn ->
+    assert_raise AssertionError, ~s[Expected 0 to be in range 1..2], fn ->
       expect(0, to: be_in_range(1..2))
+    end
+
+    assert_raise AssertionError, ~s[Expected 1 to not be in range 1..2], fn ->
+      expect(1, to_not: be_in_range(1..2))
     end
 
     assert_raise AssertionError,
@@ -108,8 +122,14 @@ defmodule Expect.MatchersTest do
       expect([player: 1], to: contain({:player, 1}))
       expect(%{name: "bob"}, to: contain({:name, "bob"}))
 
+      expect(1..10, to_not: contain(0))
+
       assert_raise AssertionError, "Expected [1, 2, 3] to contain \"bananas\"", fn ->
         expect([1, 2, 3], to: contain("bananas"))
+      end
+
+      assert_raise AssertionError, "Expected [1, 2, 3] to not contain 1", fn ->
+        expect([1, 2, 3], to_not: contain(1))
       end
     end
 
@@ -128,6 +148,7 @@ defmodule Expect.MatchersTest do
 
   test "to_match_regex matcher" do
     expect("hello", to: match_regex(~r[^h]))
+    expect("hello", to_not: match_regex(~r[bye]))
 
     assert_raise AssertionError, "Expected \"hello world\" to match regex ~r/NOPE/", fn ->
       expect("hello world", to: match_regex(~r[NOPE]))
@@ -166,6 +187,7 @@ defmodule Expect.MatchersTest do
 
   test "to_be_truthy matcher" do
     expect(true, to: be_truthy())
+    expect(false, to_not: be_truthy())
     expect("anything besides literal nil or false", to: be_truthy())
 
     assert_raise AssertionError, "Expected nil to be truthy", fn ->
@@ -179,6 +201,7 @@ defmodule Expect.MatchersTest do
 
   test "to_be_nil matcher" do
     expect(nil, to: be_nil())
+    expect(123, to_not: be_nil())
 
     assert_raise AssertionError, ~s[Expected "not nil" to be nil], fn ->
       expect("not nil", to: be_nil())
@@ -187,12 +210,13 @@ defmodule Expect.MatchersTest do
 
   test "have_length matcher" do
     expect([], to: have_length(0))
+    expect([], to_not: have_length(1))
     expect([:madness], to: have_length(1))
     expect([hello: :world], to: have_length(1))
 
     expect("hello", to: have_length(5))
 
-    assert_raise AssertionError, ~s<Expected [] to have length 99, but it is actually 0>, fn ->
+    assert_raise AssertionError, ~s<Expected [] to have length 99>, fn ->
       expect([], to: have_length(99))
     end
 
