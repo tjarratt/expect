@@ -100,9 +100,8 @@ Expect ships with quite a few built-in matchers for you to use in tests
 Here's a non-exhaustive list of features that are in our roadmap
 
 * be_in_range matcher
-* greater_than, less_than matchers
 * be_equivalent `Date`, `Datetime` matchers
-* be_temporally (eg: a date should be greater than, or less than another)
+* be_temporally (eg: a date should occur before or after another)
 * string matching (have prefix, have suffix, contain substring)
 * match yaml, json, or xml
 * contain elements with/without strict ordering
