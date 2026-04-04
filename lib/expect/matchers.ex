@@ -132,7 +132,7 @@ defmodule Expect.Matchers do
   end
 
   defp verify_greater_than(lhs, rhs)
-       when (is_integer(lhs) or is_float(lhs)) and (is_integer(lhs) or is_float(lhs)) do
+       when (is_integer(lhs) or is_float(lhs)) and (is_integer(rhs) or is_float(rhs)) do
     if lhs > rhs do
       never_fails_matcher(true)
     else
@@ -156,7 +156,7 @@ defmodule Expect.Matchers do
   end
 
   defp verify_less_than(lhs, rhs)
-       when (is_integer(lhs) or is_float(lhs)) and (is_integer(lhs) or is_float(lhs)) do
+       when (is_integer(lhs) or is_float(lhs)) and (is_integer(rhs) or is_float(rhs)) do
     if lhs < rhs do
       never_fails_matcher(true)
     else

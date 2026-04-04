@@ -47,6 +47,12 @@ defmodule Expect.MatchersTest do
                  end
 
     assert_raise AssertionError,
+                 "Expected 1 to be greater than nil, but matcher expects only integers or floats",
+                 fn ->
+                   expect(1, to: be_greater_than(nil))
+                 end
+
+    assert_raise AssertionError,
                  ~s[Expected "abc" to be greater than "def", but matcher expects only integers or floats],
                  fn ->
                    expect("abc", to: be_greater_than("def"))
@@ -68,6 +74,12 @@ defmodule Expect.MatchersTest do
                  "Expected nil to be less than 2, but matcher expects only integers or floats",
                  fn ->
                    expect(nil, to: be_less_than(2))
+                 end
+
+    assert_raise AssertionError,
+                 "Expected 1 to be less than nil, but matcher expects only integers or floats",
+                 fn ->
+                   expect(1, to: be_less_than(nil))
                  end
 
     assert_raise AssertionError,
