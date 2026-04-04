@@ -108,8 +108,11 @@ Here's a non-exhaustive list of features that are in our roadmap
 * be struct of a given type
 * have key present in map
 * satisfy all, satisfy any, satisfy
+* Matchers can return an optional suffix when the match fails
+  * eg: "expected [1,2,3] to have length 99, but it was actually 3"
+  * "but it was actually 3" is an example of an optional suffix
 
-Many of these can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers)
+Many of these features can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers)
 
 ## Docs
 
