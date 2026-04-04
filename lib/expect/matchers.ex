@@ -169,9 +169,11 @@ defmodule Expect.Matchers do
   end
 
   @doc """
-  Verifies that the provided `value` is in the list `expected`
+  Verifies that the provided `value` is in the given Enum
 
-  If you want to verify that the list ONLY contains the one value then use `:only`
+  Works with any Enumerable type (eg: Lists, Keyword lists, Ranges, Maps, etc)
+
+  If you want to verify that the enumerable ONLY contains the one value then use `:only`
 
   `expect([1], to: contain(only: 1))`
   """
