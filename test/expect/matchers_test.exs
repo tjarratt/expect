@@ -122,6 +122,12 @@ defmodule Expect.MatchersTest do
     end
 
     assert_raise AssertionError,
+                 ~s<Expected [] to have length abc, but the input to have_length/1 is not an integer>,
+                 fn ->
+                   expect([], to: have_length("abc"))
+                 end
+
+    assert_raise AssertionError,
                  ~s[Expected nil to have length 99, but it is neither a list nor a string],
                  fn ->
                    expect(nil, to: have_length(99))

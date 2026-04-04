@@ -215,7 +215,7 @@ defmodule Expect.Matchers do
   end
 
   defp verify_length(list, expected_length)
-       when is_list(list) do
+       when is_list(list) and is_integer(expected_length) do
     actual_length = length(list)
 
     if actual_length == expected_length do
@@ -226,10 +226,16 @@ defmodule Expect.Matchers do
   end
 
   defp verify_length(binary, expected_length)
-       when is_binary(binary) do
+       when is_binary(binary) and is_integer(expected_length) do
     actual_length = String.length(binary)
 
     (actual_length == expected_length) |> never_fails_matcher()
+  end
+
+  defp verify_length(_given, expected_length) when not is_integer(expected_length) do
+    %ErrorResult{
+      error: "the input to have_length/1 is not an integer"
+    }
   end
 
   defp verify_length(_bad_input, _expected_length) do
