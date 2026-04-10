@@ -8,7 +8,7 @@ and allow you to write tests that more clearly reveal their intent.
 
 Instead of writing the following...
 
-```
+```elixir
 subject = %Author{name: "Douglas Adams", answer: 42}
 
 assert subject.name == "Douglas Adams"
@@ -17,7 +17,7 @@ assert subject.answer == 42
 
 you can write...
 
-```
+```elixir
 use Expect
 
 expect(subject.name, to: equal("Douglas Adams"))
