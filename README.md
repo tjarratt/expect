@@ -100,7 +100,12 @@ Expect ships with quite a few built-in matchers for you to use in tests
 Here's a non-exhaustive list of features that are in our roadmap
 
 * be_equivalent `Date`, `Datetime` matchers
+    * be_same_day (works with date, datetime)
 * be_temporally (eg: a date should occur before or after another)
+    * occur_after
+    * occur_before
+    * occur_on_or_after
+    * occur_on_or_before
 * string matching (have prefix, have suffix, contain substring)
 * match yaml, json, or xml
 * contain elements with/without strict ordering
