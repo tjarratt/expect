@@ -138,18 +138,18 @@ defmodule Expect do
 
       result = matcher.(unquote(given))
 
-      case result do
-        %ErrorResult{error: error_message} ->
-          raise Expect.AssertionError,
-            message:
-              "Expected #{unquote(given) |> inspect()} to #{matcher_name}, but #{error_message}"
+      (fn
+         %ErrorResult{error: error_message} ->
+           raise Expect.AssertionError,
+             message:
+               "Expected #{unquote(given) |> inspect()} to #{matcher_name}, but #{error_message}"
 
-        %Result{succeeded?: true} ->
-          :ok
+         %Result{succeeded?: true} ->
+           :ok
 
-        %Result{succeeded?: false} ->
-          raise_error(unquote(given) |> inspect(), "to", matcher_name, expected)
-      end
+         %Result{succeeded?: false} ->
+           raise_error(unquote(given) |> inspect(), "to", matcher_name, expected)
+       end).(result)
     end
   end
 
@@ -159,18 +159,18 @@ defmodule Expect do
 
       result = matcher.(unquote(given))
 
-      case result do
-        %ErrorResult{error: error_message} ->
-          raise Expect.AssertionError,
-            message:
-              "Expected #{unquote(given) |> inspect()} to not #{matcher_name}, but #{error_message}"
+      (fn
+         %ErrorResult{error: error_message} ->
+           raise Expect.AssertionError,
+             message:
+               "Expected #{unquote(given) |> inspect()} to not #{matcher_name}, but #{error_message}"
 
-        %Result{succeeded?: false} ->
-          :ok
+         %Result{succeeded?: false} ->
+           :ok
 
-        %Result{succeeded?: true} ->
-          raise_error(unquote(given) |> inspect, "to not", matcher_name, expected)
-      end
+         %Result{succeeded?: true} ->
+           raise_error(unquote(given) |> inspect, "to not", matcher_name, expected)
+       end).(result)
     end
   end
 
