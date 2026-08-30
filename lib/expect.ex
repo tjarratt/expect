@@ -85,6 +85,8 @@ defmodule Expect do
     end
   end
 
+  # # # pattern matching support
+
   # pattern match is tricky to implement
   # ideally this would be implemented as its own matcher
   # but it's important that both the given and actual are unquoted
@@ -128,6 +130,8 @@ defmodule Expect do
     end
   end
 
+  # # # positive, negative matches
+
   defmacro expect(given, to: matcher_args) do
     quote do
       %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
@@ -170,7 +174,7 @@ defmodule Expect do
     end
   end
 
-  # # # Interal, intended to be private but left public so macros can refer to them
+  # # # Internal - intended to be private but left public so macros can refer to them
 
   @doc false
   def raise_error(given, proposition, matcher_property, %Expect.Matchers.NoValue{}) do
