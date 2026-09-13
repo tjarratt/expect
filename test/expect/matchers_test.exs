@@ -253,4 +253,28 @@ defmodule Expect.MatchersTest do
                    fn -> expect(%{hello: "whoopsie"}, to: pattern_match(%{hello: "world"})) end
     end
   end
+
+  describe "be_an_error matcher" do
+    test "succeeds when the actual is just the atom :error" do
+      expect(:error, to: be_an_error())
+    end
+
+    test "succeeds when the actual is an error tuple of size 2" do
+      expect({:error, "oh noes"}, to: be_an_error())
+    end
+
+    test "fails when the actual is not an error tuple" do
+      assert_raise AssertionError, ~s[Expected {:ok, "s'all good"} to be an error tuple], fn ->
+        expect({:ok, "s'all good"}, to: be_an_error())
+      end
+    end
+
+    test "fails when the actual is an error tuple of size > 2" do
+      assert_raise AssertionError,
+                   ~s[Expected {:error, "whoops", nil} to be an error tuple, but it was neither :error or {:error, something}],
+                   fn ->
+                     expect({:error, "whoops", nil}, to: be_an_error())
+                   end
+    end
+  end
 end

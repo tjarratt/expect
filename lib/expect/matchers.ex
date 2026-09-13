@@ -266,6 +266,31 @@ defmodule Expect.Matchers do
     }
   end
 
+  @doc "Verifies that `expected` is either the atom `:error` or an error tuple"
+  @spec be_an_error() :: t()
+  def be_an_error() do
+    %CustomMatcher{
+      name: "be an error tuple",
+      fn: fn
+        :error ->
+          never_fails_matcher(true)
+
+        {:error, _anything} ->
+          never_fails_matcher(true)
+
+        tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
+          %ErrorResult{
+            error: "it was neither :error or {:error, something}"
+          }
+
+        _otherwise ->
+          never_fails_matcher(false)
+      end
+    }
+  end
+
+  # # # Private
+
   defp verify_length(list, expected_length)
        when is_list(list) and is_integer(expected_length) do
     actual_length = length(list)
