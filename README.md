@@ -93,6 +93,7 @@ Expect ships with quite a few built-in matchers for you to use in tests
 * be truthy
 * be nil
 * have length
+* be error
 * match pattern (eg: `assert %{key: value} = %{key: "value"}`)
 
 ## Roadmap

@@ -1,13 +1,21 @@
 # Changelog
 
+## 3.1
+
+### Enhancements
+
+* Added a new matcher `be_error` that can be used to verify a binding is an error tuple or ':error'
+
 ## 3.0
 
 ### Enhancements
+
 * Suppress warnings from elixir 1.19 compiler
 * When a match fails, print the value of the variables instead of "expected 'my_var' to equal 'some_other_var'"
 
 ### Breaking changes
-* Experimental : Custom Matcher interface is changing
+
+* Experimental : Custom Matcher interface has changed again, but it should be more stable now
 
 
 ## v2.1
