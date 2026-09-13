@@ -7,5 +7,5 @@ git diff --quiet && git diff --cached --quiet || (echo "Fix the formatting first
 mix check
 INCLUDE_TESTS_WITH_WARNINGS=true mix test
 
-git push origin head
+git push origin HEAD
 git push --tags
