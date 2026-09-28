@@ -200,7 +200,7 @@ defmodule Expect do
   end
 
   @doc false
-  defp mangle_names(ast = {key, {name, attrs, last}}) when is_atom(name) do
+  defp underscore_variables(ast = {key, {name, attrs, last}}) when is_atom(name) do
     if is_binding(name) do
       {key, {:_, attrs, last}}
     else
@@ -208,7 +208,7 @@ defmodule Expect do
     end
   end
 
-  defp mangle_names({name, attrs, last} = ast) do
+  defp underscore_variables({name, attrs, last} = ast) do
     if is_binding(name) do
       {:_, attrs, last}
     else
@@ -216,25 +216,25 @@ defmodule Expect do
     end
   end
 
-  defp mangle_names(otherwise), do: otherwise
+  defp underscore_variables(otherwise), do: otherwise
 
   @doc false
   defp ignoring_bindings({:%{}, _attrs, kv_pairs} = ast) do
-    ast |> put_elem(2, Enum.map(kv_pairs, &mangle_names/1))
+    ast |> put_elem(2, Enum.map(kv_pairs, &underscore_variables/1))
   end
 
   defp ignoring_bindings([{:|, attrs, children}]) do
     [
-      {:|, attrs, Enum.map(children, &mangle_names/1)}
+      {:|, attrs, Enum.map(children, &underscore_variables/1)}
     ]
   end
 
   defp ignoring_bindings(list) when is_list(list) do
-    Enum.map(list, &mangle_names/1)
+    Enum.map(list, &underscore_variables/1)
   end
 
   defp ignoring_bindings({:{}, attrs, children}) do
-    {:{}, attrs, Enum.map(children, &mangle_names/1)}
+    {:{}, attrs, Enum.map(children, &underscore_variables/1)}
   end
 
   defp ignoring_bindings(otherwise), do: otherwise
