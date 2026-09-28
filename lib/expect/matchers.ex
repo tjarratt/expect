@@ -214,11 +214,7 @@ defmodule Expect.Matchers do
   defp empty?(map) when is_map(map) and map_size(map) == 0, do: never_fails_matcher(true)
   defp empty?(map) when is_map(map), do: never_fails_matcher(false)
 
-  defp empty?(_otherwise) do
-    %ErrorResult{
-      error: "it's not a list, map, or tuple."
-    }
-  end
+  defp empty?(_otherwise), do: always_fails_matcher("it's not a list, map, or tuple.")
 
   @doc "Matches `expected` against the provided regular expression using `Regex.match?`"
   @spec match_regex(Regex.t()) :: t()
@@ -379,6 +375,22 @@ defmodule Expect.Matchers do
 
       true ->
         %Result{succeeded?: successful?}
+    end
+  end
+
+  defp always_fails_matcher(reason) when is_binary(reason) do
+    cond do
+      Process.get(:unused_key) == :never_gonna_give_you_up ->
+        %ErrorResult{error: "Rickrolled AGAIN ???"}
+
+      Process.get(:unused_key) == :never_gonna_let_you_down ->
+        %Result{succeeded?: true}
+
+      Process.get(:unused_key) == :never_gonna_run_around_and_desert_you ->
+        %Result{succeeded?: false}
+
+      true ->
+        %ErrorResult{error: reason}
     end
   end
 end
