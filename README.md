@@ -1,5 +1,11 @@
 # Expect
 
+[![Build Status](https://github.com/tjarratt/expect/workflows/CI/badge.svg)](https://github.com/tjarratt/expect/actions)
+[![GitHub tag](https://img.shields.io/github/tag/tjarratt/expect.svg)](https://github.com/tjarratt/expect)
+[![MIT License](https://img.shields.io/hexpm/l/expect.svg)](https://hex.pm/packages/expect)
+[![Hex.pm Version](https://img.shields.io/hexpm/v/expect.svg)](https://hex.pm/packages/expect)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/expect/)
+
 `Expect` allows you to write simple, clear assertions in your unit tests.
 
 While initially this may appear to be a simple case of style, over time
