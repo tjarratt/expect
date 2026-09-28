@@ -133,9 +133,8 @@ defmodule Expect.Matchers do
     never_fails_matcher(lhs > rhs)
   end
 
-  defp verify_greater_than(_lhs, _rhs) do
-    %ErrorResult{error: "matcher expects only integers or floats"}
-  end
+  defp verify_greater_than(_lhs, _rhs),
+    do: always_fails_matcher("matcher expects only integers or floats")
 
   @doc """
   Verifies that `expected` is strictly less than `value`, using `<`.
@@ -152,9 +151,8 @@ defmodule Expect.Matchers do
     never_fails_matcher(lhs < rhs)
   end
 
-  defp verify_less_than(_lhs, _rhs) do
-    %ErrorResult{error: "matcher expects only integers or floats"}
-  end
+  defp verify_less_than(_lhs, _rhs),
+    do: always_fails_matcher("matcher expects only integers or floats")
 
   @doc """
   Verifies that the provided `value` is in the given Enum
@@ -193,11 +191,8 @@ defmodule Expect.Matchers do
     never_fails_matcher(given in range)
   end
 
-  defp verify_in_range(_range, given) do
-    %ErrorResult{
-      error: "#{inspect(given)} is not an integer"
-    }
-  end
+  defp verify_in_range(_range, given),
+    do: always_fails_matcher("#{inspect(given)} is not an integer")
 
   @doc "Verifies that `expected` is an empty list, map, or tuple"
   @spec be_empty() :: t()
@@ -262,31 +257,6 @@ defmodule Expect.Matchers do
     }
   end
 
-  @doc "Verifies that `expected` is either the atom `:error` or an error tuple"
-  @spec be_an_error() :: t()
-  def be_an_error() do
-    %CustomMatcher{
-      name: "be an error tuple",
-      fn: fn
-        :error ->
-          never_fails_matcher(true)
-
-        {:error, _anything} ->
-          never_fails_matcher(true)
-
-        tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
-          %ErrorResult{
-            error: "it was neither :error or {:error, something}"
-          }
-
-        _otherwise ->
-          never_fails_matcher(false)
-      end
-    }
-  end
-
-  # # # Private
-
   defp verify_length(list, expected_length)
        when is_list(list) and is_integer(expected_length) do
     actual_length = length(list)
@@ -302,16 +272,35 @@ defmodule Expect.Matchers do
   end
 
   defp verify_length(_given, expected_length) when not is_integer(expected_length) do
-    %ErrorResult{
-      error: "the input to have_length/1 is not an integer"
-    }
+    always_fails_matcher("the input to have_length/1 is not an integer")
   end
 
   defp verify_length(_bad_input, _expected_length) do
-    %ErrorResult{
-      error: "it is neither a list nor a string"
+    always_fails_matcher("it is neither a list nor a string")
+  end
+
+  @doc "Verifies that `expected` is either the atom `:error` or an error tuple"
+  @spec be_an_error() :: t()
+  def be_an_error() do
+    %CustomMatcher{
+      name: "be an error tuple",
+      fn: fn
+        :error ->
+          never_fails_matcher(true)
+
+        {:error, _anything} ->
+          never_fails_matcher(true)
+
+        tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
+          always_fails_matcher("it was neither :error or {:error, something}")
+
+        _otherwise ->
+          never_fails_matcher(false)
+      end
     }
   end
+
+  # # # Pattern matching
 
   @doc """
     Verifies that the given value matches against the given pattern.
@@ -348,6 +337,8 @@ defmodule Expect.Matchers do
   defmacro pattern_match(expected) do
     {:pattern_match, expected}
   end
+
+  # # # Private
 
   defp never_fails_matcher(successful?) when is_boolean(successful?) do
     # workaround for elixir 1.19 compiler being TOO GOOD
