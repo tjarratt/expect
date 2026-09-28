@@ -93,12 +93,14 @@ defmodule Expect do
   # here at the same time, otherwise we lose information
   #
   # as far as I can tell, this is the only way we could implement such a matcher
+  # but I'd love to explore other ways of doing this (so long as it preserves the API)
   defmacro expect(given, to: {:pattern_match, _where, [actual]}) do
     given_as_string = Macro.to_string(given)
+    given_no_bindings = ignoring_bindings(given)
 
     quote do
       try do
-        unquote(given) = unquote(actual)
+        unquote(given_no_bindings) = unquote(actual)
       rescue
         MatchError ->
           # credo:disable-for-next-line Credo.Check.Warning.RaiseInsideRescue
@@ -187,6 +189,34 @@ defmodule Expect do
   def raise_error(given, proposition, matcher_property, expected) do
     raise Expect.AssertionError,
       message: "Expected #{given} #{proposition} #{matcher_property} #{inspect(expected)}"
+  end
+
+  @doc false
+  defp is_binding(atom) when is_atom(atom) do
+    (binary_part(Atom.to_string(atom), 0, 1) >= "a" and
+       binary_part(Atom.to_string(atom), 0, 1) <= "z") or
+      (binary_part(Atom.to_string(atom), 0, 1) >= "A" and
+         binary_part(Atom.to_string(atom), 0, 1) <= "Z")
+  end
+
+  @doc false
+  defp mangle_names(ast = {key, {name, attrs, last}}) when is_atom(name) do
+    if is_binding(name) do
+      {key, {:_, attrs, last}}
+    else
+      ast
+    end
+  end
+
+  defp mangle_names(otherwise), do: otherwise
+
+  @doc false
+  defp ignoring_bindings({:%{}, _attrs, kv_pairs} = ast) do
+    ast |> put_elem(2, Enum.map(kv_pairs, &mangle_names/1))
+  end
+
+  defp ignoring_bindings(otherwise) do
+    otherwise
   end
 end
 
