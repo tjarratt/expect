@@ -109,6 +109,7 @@ defmodule Expect do
 
       # perform the pattern match ONE MORE TIME
       # this allows for the variables bound given to be used later in the test
+      # which we cannot do otherwise, because of the try/do/rescue block
       unquote(given) = unquote(actual)
     end
   end
