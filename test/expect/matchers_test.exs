@@ -299,6 +299,13 @@ defmodule Expect.MatchersTest do
 
       expect([_something | _], to: pattern_match(["abc"]))
     end
+
+    test "when called with a tuple" do
+      expect({a}, to: pattern_match({"heyo"}))
+      expect(a, to: equal("heyo"))
+
+      expect({^a, _}, to: pattern_match({"heyo", "boyo"}))
+    end
   end
 
   describe "be_an_error matcher" do

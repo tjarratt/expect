@@ -233,9 +233,11 @@ defmodule Expect do
     Enum.map(list, &mangle_names/1)
   end
 
-  defp ignoring_bindings(otherwise) do
-    otherwise
+  defp ignoring_bindings({:{}, attrs, children}) do
+    {:{}, attrs, Enum.map(children, &mangle_names/1)}
   end
+
+  defp ignoring_bindings(otherwise), do: otherwise
 end
 
 defmodule Expect.ProgrammerError do
