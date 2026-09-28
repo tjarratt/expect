@@ -208,11 +208,29 @@ defmodule Expect do
     end
   end
 
+  defp mangle_names({name, attrs, last} = ast) do
+    if is_binding(name) do
+      {:_, attrs, last}
+    else
+      ast
+    end
+  end
+
   defp mangle_names(otherwise), do: otherwise
 
   @doc false
   defp ignoring_bindings({:%{}, _attrs, kv_pairs} = ast) do
     ast |> put_elem(2, Enum.map(kv_pairs, &mangle_names/1))
+  end
+
+  defp ignoring_bindings([{:|, attrs, children}]) do
+    [
+      {:|, attrs, Enum.map(children, &mangle_names/1)}
+    ]
+  end
+
+  defp ignoring_bindings(list) when is_list(list) do
+    Enum.map(list, &mangle_names/1)
   end
 
   defp ignoring_bindings(otherwise) do

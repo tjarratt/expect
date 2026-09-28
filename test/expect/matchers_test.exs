@@ -247,23 +247,30 @@ defmodule Expect.MatchersTest do
       expect(whom, to: equal("world"))
     end
 
-    test "doesn't emit warnings when binding" do
-      # due to how pattern_match/1 is implemented, it has historically consistently raised warnings
-      # when run with the new set-theoretic compiler in elixir 1.19+. Since I dislike
-      # seeing warnings in my test suits , it was deeply bothering to me to see these warnings
-      #
-      # sidebar : notice how expect has a regular suite and a separate one for tests that raise warnings
-      #           some of these warnings may be useful to users, but only in rare scenarios
-      #
-      # under the hood `expect` will perform two matches (one to see if it passes or fails)
-      # and then a second one. The first one is surrounded by a try/rescue which is necessary
-      # to recover from any raised errors.
-      # The second pattern match then serves to capture bindings for later assertions
-      # For the first pattern match we mangle the AST and underscore any bound variables
-      #
-      # anyway, this test serves to verify we haven't done anything terribly dumb when we're
-      # mangling variable names inside of maps
+    test "shows an informative error when the pattern match fails" do
+      assert_raise AssertionError,
+                   ~s[Expected %{hello: "whoopsie"} to match pattern %{hello: "world"}, but it did not.],
+                   fn -> expect(%{hello: "whoopsie"}, to: pattern_match(%{hello: "world"})) end
+    end
+  end
 
+  describe "avoiding warnings with pattern_match/1" do
+    # due to how pattern_match/1 is implemented, it has historically consistently raised warnings
+    # when run with the new set-theoretic compiler in elixir 1.19+. Since I dislike
+    # seeing warnings in my test suits , it was deeply bothering to me to see these warnings
+    #
+    # sidebar : notice how expect has a regular suite and a separate one for tests that raise warnings
+    #           some of these warnings may be useful to users, but only in rare scenarios
+    #
+    # under the hood `expect` will perform two matches (one to see if it passes or fails)
+    # and then a second one. The first one is surrounded by a try/rescue which is necessary
+    # to recover from any raised errors.
+    # The second pattern match then serves to capture bindings for later assertions
+    # For the first pattern match we mangle the AST and underscore any bound variables
+    #
+    # anyway, this test serves to verify we haven't done anything terribly dumb when we're
+    # mangling variable names inside of maps
+    test "when called with a map" do
       a_given_map = %{hello: "everyone", goodbye: "noone"}
       expect(%{hello: whom, goodbye: "noone"}, to: pattern_match(a_given_map))
       expect(whom, to: equal("everyone"))
@@ -274,10 +281,23 @@ defmodule Expect.MatchersTest do
       expect(%{hello: ^correct}, to: pattern_match(%{hello: "world"}))
     end
 
-    test "shows an informative error when the pattern match fails" do
-      assert_raise AssertionError,
-                   ~s[Expected %{hello: "whoopsie"} to match pattern %{hello: "world"}, but it did not.],
-                   fn -> expect(%{hello: "whoopsie"}, to: pattern_match(%{hello: "world"})) end
+    test "when called with a list" do
+      expect([], to: pattern_match([]))
+
+      expect([_], to: pattern_match(["abc"]))
+
+      # first bind, then assert on them
+      expect([a, b, c], to: pattern_match(["a", "b", "c"]))
+      expect([a, b, c], to: equal(["a", "b", "c"]))
+
+      # use pins
+      expect([_a, ^b, _c], to: pattern_match(["a", "b", "c"]))
+
+      # list construction
+      expect([something | _], to: pattern_match(["abc"]))
+      expect(something, to: equal("abc"))
+
+      expect([_something | _], to: pattern_match(["abc"]))
     end
   end
 
