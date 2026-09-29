@@ -136,7 +136,7 @@ defmodule Expect do
   # # # positive, negative matches
 
   defmacro expect(given, to: matcher_args) do
-    quote do
+    quote generated: true do
       %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
 
       result = matcher.(unquote(given))
@@ -157,7 +157,7 @@ defmodule Expect do
   end
 
   defmacro expect(given, to_not: matcher_args) do
-    quote do
+    quote generated: true do
       %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
 
       result = matcher.(unquote(given))

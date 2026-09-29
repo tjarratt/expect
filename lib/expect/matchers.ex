@@ -341,47 +341,10 @@ defmodule Expect.Matchers do
   # # # Private
 
   defp never_fails_matcher(successful?) when is_boolean(successful?) do
-    # workaround for elixir 1.19 compiler being TOO GOOD
-    # without this workaround, we get a lot of warnings because
-    # not all of the matchers are going to return all of the
-    # possible types that a matcher could return, to whit :
-    # - %Result{successful?: true}
-    # - %Result{successful?: false}
-    # - %ErrorResult{error: binary()}
-    #
-    # this ensures that each matcher has code paths that the compiler
-    # is not clever enough to realize will never execute, primarily
-    # because the return type of Process.get/1 is dynamic
-    #
-    # see jose's insights here : https://elixirforum.com/t/elixir-v1-18-0-rc-0-released/68015/31
-    cond do
-      Process.get(:unused_key) == :never_gonna_give_you_up ->
-        %ErrorResult{error: "Rickrolled AGAIN ???"}
-
-      Process.get(:unused_key) == :never_gonna_let_you_down ->
-        %Result{succeeded?: true}
-
-      Process.get(:unused_key) == :never_gonna_run_around_and_desert_you ->
-        %Result{succeeded?: false}
-
-      true ->
-        %Result{succeeded?: successful?}
-    end
+    %Result{succeeded?: successful?}
   end
 
   defp always_fails_matcher(reason) when is_binary(reason) do
-    cond do
-      Process.get(:unused_key) == :never_gonna_give_you_up ->
-        %ErrorResult{error: "Rickrolled AGAIN ???"}
-
-      Process.get(:unused_key) == :never_gonna_let_you_down ->
-        %Result{succeeded?: true}
-
-      Process.get(:unused_key) == :never_gonna_run_around_and_desert_you ->
-        %Result{succeeded?: false}
-
-      true ->
-        %ErrorResult{error: reason}
-    end
+    %ErrorResult{error: reason}
   end
 end
