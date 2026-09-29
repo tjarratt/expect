@@ -34,13 +34,30 @@ See the documentation on `Expect.Matchers` for more examples of matchers to use.
 
 ## Installation
 
-Add `expect` to your list of dependencies in `mix.exs`:
+Add `expect` to your list of dependencies in `mix.exs` :
 
 ```elixir
 def deps do
   [
     {:expect, "~> 2.0"}
   ]
+end
+```
+
+Run `mix deps.get` then use it in your tests :
+
+```elixir
+defmodule MyApp.PoetryTest do
+    use ExUnit.Case, async: true
+    use Expect
+
+    test "it gyres and gimbles when it's brillig" do
+        poem = Poetry.generate("'Twas brillig")
+
+        expect(poem.author, to: equal("Lewis Carrol"))
+        expect(poem.year, to: be_less_than(2026))
+        expect(poem.body, to: match_regex(~r"gyre and gimble"))
+    end
 end
 ```
 
