@@ -134,7 +134,7 @@ defmodule Expect.Matchers do
   end
 
   defp verify_greater_than(_lhs, _rhs),
-    do: always_fails_matcher("matcher expects only integers or floats")
+    do: error_result("matcher expects only integers or floats")
 
   @doc """
   Verifies that `expected` is strictly less than `value`, using `<`.
@@ -152,7 +152,7 @@ defmodule Expect.Matchers do
   end
 
   defp verify_less_than(_lhs, _rhs),
-    do: always_fails_matcher("matcher expects only integers or floats")
+    do: error_result("matcher expects only integers or floats")
 
   @doc """
   Verifies that the provided `value` is in the given Enum
@@ -192,7 +192,7 @@ defmodule Expect.Matchers do
   end
 
   defp verify_in_range(_range, given),
-    do: always_fails_matcher("#{inspect(given)} is not an integer")
+    do: error_result("#{inspect(given)} is not an integer")
 
   @doc "Verifies that `expected` is an empty list, map, or tuple"
   @spec be_empty() :: t()
@@ -209,7 +209,7 @@ defmodule Expect.Matchers do
   defp empty?(map) when is_map(map) and map_size(map) == 0, do: never_fails_matcher(true)
   defp empty?(map) when is_map(map), do: never_fails_matcher(false)
 
-  defp empty?(_otherwise), do: always_fails_matcher("it's not a list, map, or tuple.")
+  defp empty?(_otherwise), do: error_result("it's not a list, map, or tuple.")
 
   @doc "Matches `expected` against the provided regular expression using `Regex.match?`"
   @spec match_regex(Regex.t()) :: t()
@@ -272,11 +272,11 @@ defmodule Expect.Matchers do
   end
 
   defp verify_length(_given, expected_length) when not is_integer(expected_length) do
-    always_fails_matcher("the input to have_length/1 is not an integer")
+    error_result("the input to have_length/1 is not an integer")
   end
 
   defp verify_length(_bad_input, _expected_length) do
-    always_fails_matcher("it is neither a list nor a string")
+    error_result("it is neither a list nor a string")
   end
 
   @doc "Verifies that `expected` is either the atom `:error` or an error tuple"
@@ -292,7 +292,7 @@ defmodule Expect.Matchers do
           never_fails_matcher(true)
 
         tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
-          always_fails_matcher("it was neither :error or {:error, something}")
+          error_result("it was neither :error or {:error, something}")
 
         _otherwise ->
           never_fails_matcher(false)
@@ -344,7 +344,7 @@ defmodule Expect.Matchers do
     %Result{succeeded?: successful?}
   end
 
-  defp always_fails_matcher(reason) when is_binary(reason) do
+  defp error_result(reason) when is_binary(reason) do
     %ErrorResult{error: reason}
   end
 end
