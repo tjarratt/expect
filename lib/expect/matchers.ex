@@ -157,18 +157,51 @@ defmodule Expect.Matchers do
   @doc """
   Verifies that the provided `value` is in the given Enum
 
-  Works with any Enumerable type (eg: Lists, Keyword lists, Ranges, Maps, etc)
+  Works with any Enumerable type (eg: Lists, Keyword lists, Ranges, Maps, etc).
 
-  If you want to verify that the enumerable ONLY contains the one value then use `:only`
+  `expect([1,2,3], to: contain(1))`
 
-  `expect([1], to: contain(only: 1))`
+  You can provide the keyword `:only` which verifies that the value
+  passed to `contain/1` is the one and only value inside the given Enum.
+
+  ```
+  # passes
+  expect([1], to: contain(only: 1))
+
+  # fails
+  expect([1, 2, 3], to: contain(only: 1))
+  ```
+
+  You can also verify that a given enum only contains a list of values,
+  either in order, or regardless of order.
+
+  ```
+  # passes
+  expect([1, 2, 3], to: contain(elements: [1,2]))
+  expect([1, 2, 3], to: contain(elements: [2,1], :in_any_order))
+
+  # failed
+  expect([1, 2, 3], to: contain(elements: [2,1]))
+  ```
   """
   @spec contain(any()) :: t()
   @spec contain(only: any()) :: t()
-  def contain(only: one_value) do
+  def contain(only: one_value) when not is_list(one_value) do
     %CustomMatcher{
       name: "only contain #{inspect(one_value)}",
-      fn: fn given -> never_fails_matcher(given == [one_value]) end
+      fn: fn given when is_list(given) ->
+        never_fails_matcher(length(given) == 1 and one_value in given)
+      end
+    }
+  end
+
+  def contain(only: values) when is_list(values) do
+    %CustomMatcher{
+      name: "only contain #{inspect(values)}",
+      fn: fn
+        given ->
+          never_fails_matcher(MapSet.new(given) == MapSet.new(values))
+      end
     }
   end
 
