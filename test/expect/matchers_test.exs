@@ -204,7 +204,7 @@ defmodule Expect.MatchersTest do
     end
   end
 
-  test "to_match_regex matcher" do
+  test "match_regex matcher" do
     expect("hello", to: match_regex(~r[^h]))
     expect("hello", to_not: match_regex(~r[bye]))
 
@@ -213,7 +213,7 @@ defmodule Expect.MatchersTest do
     end
   end
 
-  test "to_be_empty matcher" do
+  test "be_empty matcher" do
     expect([], to: be_empty())
     expect(%{}, to: be_empty())
     expect({}, to: be_empty())
