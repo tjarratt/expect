@@ -8,4 +8,8 @@ mix check
 INCLUDE_TESTS_WITH_WARNINGS=true mix test
 
 git push origin HEAD
-git push --tags
+git push origin --tags
+
+git push github HEAD
+git push github --tags
+
