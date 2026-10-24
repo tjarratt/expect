@@ -135,6 +135,29 @@ defmodule Expect.MatchersTest do
       end
     end
 
+    test "works with any enumerable, eg: list, range, keyword list, map" do
+      expect([1, 2, 3], to: contain(1))
+      expect(1..3, to: contain(1))
+      expect([keyword: 1], to: contain({:keyword, 1}))
+      expect(%{key: "value"}, to: contain({:key, "value"}))
+
+      assert_raise AssertionError, "Expected [1, 2, 3] to contain 4", fn ->
+        expect([1, 2, 3], to: contain(4))
+      end
+
+      assert_raise AssertionError, "Expected 1..3 to contain 4", fn ->
+        expect(1..3, to: contain(4))
+      end
+
+      assert_raise AssertionError, "Expected [keyword: :lists] to contain 4", fn ->
+        expect([keyword: :lists], to: contain(4))
+      end
+
+      assert_raise AssertionError, "Expected %{key: :value} to contain 4", fn ->
+        expect(%{key: :value}, to: contain(4))
+      end
+    end
+
     test "can verify that the value is the only one present" do
       expect([1], to: contain(only: 1))
 
@@ -166,41 +189,29 @@ defmodule Expect.MatchersTest do
         expect([1, 2, 3], to: contain(only: [4, 5, 6]))
       end
     end
+  end
 
-    test "when passed `only: ..., :in_any_order`, verifies that the list only contains some values, regardless of order" do
-      expect([1, 2, 3], to: contain(only: [3, 2, 1], in_any_order: true))
+  describe "contain_in_any_order matcher" do
+    test "verifies that the list only contains the provided values, regardless of order" do
+      expect([1, 2, 3], to: contain_in_any_order([3, 2, 1]))
+      expect([1, 2, 3], to: contain_in_any_order([1]))
+      expect([1, 2, 3, 4], to: contain_in_any_order([3, 2, 1]))
 
-      expect([1, 2, 3, 4], to_not: contain(only: [3, 2, 1], in_any_order: true))
-      expect([1, 2, 3], to_not: contain(only: [4, 3, 2, 1], in_any_order: true))
+      expect([1, 2, 3], to_not: contain_in_any_order([4, 3, 2, 1]))
 
       assert_raise AssertionError,
-                   "Expected [1, 2, 3] to only contain [1, 2] (regardless of order)",
+                   "Expected [1, 2, 3] to contain [4, 5, 6] (regardless of order)",
                    fn ->
-                     expect([1, 2, 3], to: contain(only: [1, 2], in_any_order: true))
+                     expect([1, 2, 3], to: contain_in_any_order([4, 5, 6]))
                    end
     end
 
-    test "works with any enumerable, eg: list, range, keyword list, map" do
-      expect([1, 2, 3], to: contain(1))
-      expect(1..3, to: contain(1))
-      expect([keyword: 1], to: contain({:keyword, 1}))
-      expect(%{key: "value"}, to: contain({:key, "value"}))
-
-      assert_raise AssertionError, "Expected [1, 2, 3] to contain 4", fn ->
-        expect([1, 2, 3], to: contain(4))
-      end
-
-      assert_raise AssertionError, "Expected 1..3 to contain 4", fn ->
-        expect(1..3, to: contain(4))
-      end
-
-      assert_raise AssertionError, "Expected [keyword: :lists] to contain 4", fn ->
-        expect([keyword: :lists], to: contain(4))
-      end
-
-      assert_raise AssertionError, "Expected %{key: :value} to contain 4", fn ->
-        expect(%{key: :value}, to: contain(4))
-      end
+    test "returns a nice error when not called with a list" do
+      assert_raise AssertionError,
+                   "Expected :whoopsie to contain [1, 2, 3] (regardless of order), but :whoopsie is not a list",
+                   fn ->
+                     expect(:whoopsie, to: contain_in_any_order([1, 2, 3]))
+                   end
     end
   end
 

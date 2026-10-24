@@ -201,9 +201,6 @@ defmodule Expect.Matchers do
   iex> expect([1, 2, 3], to: contain(only: [1, 2, 3]))
   :ok
 
-  iex> expect([1, 2, 3], to: contain(only: [3, 2, 1], in_any_order: true))
-  :ok
-
   # fails
   iex> expect([1, 2, 3], to: contain(only: [2, 1]))
   ** (Expect.AssertionError) Expected [1, 2, 3] to only contain [2, 1]
@@ -230,21 +227,45 @@ defmodule Expect.Matchers do
     }
   end
 
-  def contain(only: values, in_any_order: true) when is_list(values) do
-    %CustomMatcher{
-      name: "only contain #{inspect(values)} (regardless of order)",
-      fn: fn
-        given ->
-          success_result(MapSet.new(given) == MapSet.new(values))
-      end
-    }
-  end
-
   def contain(value) do
     %CustomMatcher{
       name: "contain #{inspect(value)}",
       fn: fn given -> success_result(value in given) end
     }
+  end
+
+  @doc """
+  Verifies that the provided list of `values` are in the Enum, regardless of order.
+
+  Unlike `contain/2`, this matcher does not care whether the elements appear in order
+  in the given enumerable.
+
+  ```
+  iex> expect([1, 2, 3], to: contain_in_any_order([3, 2, 1]))
+  :ok
+
+  iex> expect([1, 2, 3], to: contain_in_any_order(["whoopsie"]))
+  ** (Expect.AssertionError) Expected [1, 2, 3] to contain ["whoopsie"] (regardless of order)
+  ```
+  """
+  @spec contain_in_any_order(values :: list()) :: t()
+  def contain_in_any_order(values) do
+    %CustomMatcher{
+      name: "contain #{inspect(values)} (regardless of order)",
+      fn: fn given -> do_contain_in_any_order(given, values) end
+    }
+  end
+
+  defp do_contain_in_any_order(given, values) when is_list(given) and is_list(values) do
+    given
+    |> MapSet.new()
+    |> MapSet.union(MapSet.new(values))
+    |> MapSet.equal?(MapSet.new(given))
+    |> success_result()
+  end
+
+  defp do_contain_in_any_order(given, _values) when not is_list(given) do
+    error_result("#{inspect(given)} is not a list")
   end
 
   @spec be_in_range(Range.t()) :: t()
