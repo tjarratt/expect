@@ -1,9 +1,9 @@
 defmodule Expect.MixProject do
   use Mix.Project
 
-  @github_url "https://github.com/tjarratt/expect"
+  @git_url "https://pushin.eu/tjarratt/expect"
 
-  def project do
+  def project() do
     [
       app: :expect,
       version: "3.1.0",
@@ -14,8 +14,8 @@ defmodule Expect.MixProject do
       name: "Expect",
       description: "Write beautifully simple assertions for ExUnit using matchers",
       package: package(),
-      source_url: @github_url,
-      homepage_url: @github_url,
+      source_url: @git_url,
+      homepage_url: @git_url,
       test_paths: test_paths(System.get_env("INCLUDE_TESTS_WITH_WARNINGS"))
     ]
   end
@@ -23,13 +23,13 @@ defmodule Expect.MixProject do
   defp test_paths(nil), do: ["test"]
   defp test_paths(_), do: ["test", "test_with_warnings"]
 
-  def application do
+  def application() do
     [
       extra_applications: [:logger]
     ]
   end
 
-  defp deps do
+  defp deps() do
     [
       {:credo, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
@@ -51,7 +51,7 @@ defmodule Expect.MixProject do
         mix.exs
       ],
       licenses: ["MIT"],
-      links: %{"GitHub" => @github_url},
+      links: %{"GitHub" => @git_url},
       maintainers: ["Tim Jarratt"]
     ]
   end
@@ -60,7 +60,7 @@ defmodule Expect.MixProject do
     [
       main: "readme",
       extras: ["CHANGELOG.md", {:"README.md", [title: "Overview"]}],
-      source_url: @github_url
+      source_url: @git_url
     ]
   end
 end

@@ -1,7 +1,7 @@
 # Expect
 
 [![Build Status](https://github.com/tjarratt/expect/workflows/CI/badge.svg)](https://github.com/tjarratt/expect/actions)
-[![GitHub tag](https://img.shields.io/github/tag/tjarratt/expect.svg)](https://github.com/tjarratt/expect)
+[![GitHub tag](https://img.shields.io/github/tag/tjarratt/expect.svg)](https://pushin.eu/tjarratt/expect)
 [![MIT License](https://img.shields.io/hexpm/l/expect.svg)](https://hex.pm/packages/expect)
 [![Hex.pm Version](https://img.shields.io/hexpm/v/expect.svg)](https://hex.pm/packages/expect)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/expect/)
