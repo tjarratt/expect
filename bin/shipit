@@ -2,7 +2,9 @@
 
 set -euo pipefail
 
-git diff --quiet && git diff --cached --quiet || (echo "Fix the formatting first" && exit 1)
+mix format
+
+(git diff --quiet && git diff --cached --quiet) || (echo "Unstaged changed detected. Aborting." && exit 1)
 
 mix check
 INCLUDE_TESTS_WITH_WARNINGS=true mix test
