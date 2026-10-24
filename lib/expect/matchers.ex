@@ -178,9 +178,9 @@ defmodule Expect.Matchers do
   ```
   # passes
   expect([1, 2, 3], to: contain(elements: [1,2]))
-  expect([1, 2, 3], to: contain(elements: [2,1], :in_any_order))
+  expect([1, 2, 3], to: contain(elements: [2,1], in_any_order: true))
 
-  # failed
+  # fails
   expect([1, 2, 3], to: contain(elements: [2,1]))
   ```
   """
@@ -198,6 +198,16 @@ defmodule Expect.Matchers do
   def contain(only: values) when is_list(values) do
     %CustomMatcher{
       name: "only contain #{inspect(values)}",
+      fn: fn
+        given ->
+          never_fails_matcher(given == values)
+      end
+    }
+  end
+
+  def contain(only: values, in_any_order: true) when is_list(values) do
+    %CustomMatcher{
+      name: "only contain #{inspect(values)} (regardless of order)",
       fn: fn
         given ->
           never_fails_matcher(MapSet.new(given) == MapSet.new(values))

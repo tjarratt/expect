@@ -135,7 +135,17 @@ defmodule Expect.MatchersTest do
 
     test "can verify that the value is the only one present" do
       expect([1], to: contain(only: 1))
+
+      assert_raise AssertionError, "Expected [1, 2, 3] to only contain 1", fn ->
+        expect([1, 2, 3], to: contain(only: 1))
+      end
+    end
+
+    test "can verify that a list contains one or more elements" do
       expect([1, 2, 3], to: contain(only: [1, 2, 3]))
+
+      # order matters by default
+      expect([1, 2, 3], to_not: contain(only: [3, 2, 1]))
 
       # edge case, the semantics are that values in the list passed to`only:` should be treated as elements
       # and the list is not treated as an element in itself, should the list contain nested lists
@@ -150,9 +160,22 @@ defmodule Expect.MatchersTest do
       expect([only: 1, and: "this"], to: contain({:only, 1}))
       expect([only: 1, but_not: "this"], to_not: contain(only: {:only, 1}))
 
-      assert_raise AssertionError, "Expected [1, 2, 3] to only contain 1", fn ->
-        expect([1, 2, 3], to: contain(only: 1))
+      assert_raise AssertionError, "Expected [1, 2, 3] to only contain [4, 5, 6]", fn ->
+        expect([1, 2, 3], to: contain(only: [4, 5, 6]))
       end
+    end
+
+    test "when passed `only: ..., :in_any_order`, verifies that the list only contains some values, regardless of order" do
+      expect([1, 2, 3], to: contain(only: [3, 2, 1], in_any_order: true))
+
+      expect([1, 2, 3, 4], to_not: contain(only: [3, 2, 1], in_any_order: true))
+      expect([1, 2, 3], to_not: contain(only: [4, 3, 2, 1], in_any_order: true))
+
+      assert_raise AssertionError,
+                   "Expected [1, 2, 3] to only contain [1, 2] (regardless of order)",
+                   fn ->
+                     expect([1, 2, 3], to: contain(only: [1, 2], in_any_order: true))
+                   end
     end
   end
 
