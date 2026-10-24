@@ -1,7 +1,7 @@
 defmodule Expect.Matchers.Result do
   @moduledoc """
   Custom matchers should return this in their happy path.
-  Use the `succeeded?` field to indicate whether its condition is true or false
+  Use the `succeeded?` field to indicate whether the match was successful or not.
   """
   defstruct succeeded?: false
 end
@@ -25,6 +25,8 @@ defmodule Expect.Matchers do
   alias Expect.Matchers.Result
 
   @moduledoc """
+  Matchers are re-usable functions that make complex assertions simple and readable.
+
   A matcher is responsible for providing `expect/2` three things
 
   1. the name for the matcher

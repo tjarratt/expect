@@ -11,7 +11,9 @@ defmodule Expect.Matchers.CustomMatcher do
   @moduledoc """
   You are highly encouraged to implement your own custom matchers. For the application you
   will build, there will surely be some interesting properties and shapes of data that
-  will be important to verify. It might be easy to use the `equal()` matcher for 99%
+  will be important to verify.
+
+  It might be easy and tempting to use the `equal()` matcher for 99%
   of assertions, but writing a higher-level matcher can be much more intent revealing.
 
   Imagine we are building an application that provides users with the highest quality
