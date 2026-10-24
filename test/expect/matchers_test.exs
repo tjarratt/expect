@@ -179,6 +179,29 @@ defmodule Expect.MatchersTest do
                      expect([1, 2, 3], to: contain(only: [1, 2], in_any_order: true))
                    end
     end
+
+    test "works with any enumerable, eg: list, range, keyword list, map" do
+      expect([1, 2, 3], to: contain(1))
+      expect(1..3, to: contain(1))
+      expect([keyword: 1], to: contain({:keyword, 1}))
+      expect(%{key: "value"}, to: contain({:key, "value"}))
+
+      assert_raise AssertionError, "Expected [1, 2, 3] to contain 4", fn ->
+        expect([1, 2, 3], to: contain(4))
+      end
+
+      assert_raise AssertionError, "Expected 1..3 to contain 4", fn ->
+        expect(1..3, to: contain(4))
+      end
+
+      assert_raise AssertionError, "Expected [keyword: :lists] to contain 4", fn ->
+        expect([keyword: :lists], to: contain(4))
+      end
+
+      assert_raise AssertionError, "Expected %{key: :value} to contain 4", fn ->
+        expect(%{key: :value}, to: contain(4))
+      end
+    end
   end
 
   test "to_match_regex matcher" do
