@@ -30,10 +30,12 @@ defmodule Expect do
     Example:
 
     ```
-    expect(42, to: equal(42))
+    iex> expect(42, to: equal(42))
+    :ok
 
     # raises an error
-    expect(42, to: equal("the answer to life, the universe, and everything"))
+    iex> expect(42, to: equal("the answer to life, the universe, and everything"))
+    ** (Expect.AssertionError) Expected 42 to equal "the answer to life, the universe, and everything"
     ```
   """
 

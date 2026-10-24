@@ -1,39 +1,40 @@
 defmodule ExpectTest do
   # @related [subject](lib/expect.ex)
   use ExUnit.Case, async: true
+  use Expect
+
+  doctest Expect
 
   alias Expect.AssertionError
   alias Expect.ProgrammerError
 
-  import Expect
-
   describe "using the expect/2 function" do
     test "works if you pass it built-in types" do
-      assert expect(nil, to: equal(nil))
-      assert expect(true, to: equal(true))
-      assert expect(1, to: equal(1))
-      assert expect(1.0, to: equal(1.0))
-      assert expect("yup", to: equal("yup"))
-      assert expect([1, 2, 3], to: equal([1, 2, 3]))
-      assert expect(<<123>>, to: equal(<<123>>))
-      assert expect(%{key: "value"}, to: equal(%{key: "value"}))
-      assert expect({1, 2, 3}, to: equal({1, 2, 3}))
-      assert expect(~c'charstring', to: equal(~c'charstring'))
+      assert expect(nil, to: be_exactly(nil))
+      assert expect(true, to: be_exactly(true))
+      assert expect(1, to: be_exactly(1))
+      assert expect(1.0, to: be_exactly(1.0))
+      assert expect("yup", to: be_exactly("yup"))
+      assert expect([1, 2, 3], to: be_exactly([1, 2, 3]))
+      assert expect(<<123>>, to: be_exactly(<<123>>))
+      assert expect(%{key: "value"}, to: be_exactly(%{key: "value"}))
+      assert expect({1, 2, 3}, to: be_exactly({1, 2, 3}))
+      assert expect(~c'charstring', to: be_exactly(~c'charstring'))
     end
 
     test "can test for positive conditions" do
-      expect(true, to: equal(true))
+      expect(true, to: be_exactly(true))
 
-      assert_raise AssertionError, "Expected false to equal true", fn ->
-        expect(false, to: equal(true))
+      assert_raise AssertionError, "Expected false to be_exactly true", fn ->
+        expect(false, to: be_exactly(true))
       end
     end
 
     test "can test for negative conditions" do
-      expect(true, to_not: equal(false))
+      expect(true, to_not: be_exactly(false))
 
-      assert_raise AssertionError, "Expected false to not equal false", fn ->
-        expect(false, to_not: equal(false))
+      assert_raise AssertionError, "Expected false to not be_exactly false", fn ->
+        expect(false, to_not: be_exactly(false))
       end
     end
 
@@ -41,15 +42,15 @@ defmodule ExpectTest do
       given = "def"
       actual = "abc"
 
-      assert_raise AssertionError, ~s[Expected "abc" to equal "def"], fn ->
-        expect(actual, to: equal(given))
+      assert_raise AssertionError, ~s[Expected "abc" to be_exactly "def"], fn ->
+        expect(actual, to: be_exactly(given))
       end
 
       actual = "xyz"
       given = "xyz"
 
-      assert_raise AssertionError, ~s[Expected "xyz" to not equal "xyz"], fn ->
-        expect(actual, to_not: equal(given))
+      assert_raise AssertionError, ~s[Expected "xyz" to not be_exactly "xyz"], fn ->
+        expect(actual, to_not: be_exactly(given))
       end
     end
   end
@@ -58,7 +59,10 @@ defmodule ExpectTest do
     test "with too many args; raises a meaningful error so you know not to do that again" do
       error =
         assert_raise ProgrammerError, fn ->
-          expect(false, to: equal("whoops"), to_not: equal("oh no i accidentally all the args"))
+          expect(false,
+            to: be_exactly("whoops"),
+            to_not: be_exactly("oh no i accidentally all the args")
+          )
         end
 
       assert error.message =~
@@ -87,9 +91,9 @@ defmodule ExpectTest do
 
   # # #
 
-  defp equal(expected_value) do
+  defp be_exactly(expected_value) do
     %Expect.Matchers.CustomMatcher{
-      name: "equal",
+      name: "be_exactly",
       expected: expected_value,
       fn: fn given ->
         # workaround elixir 1.19 compiler
