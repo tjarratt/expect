@@ -107,14 +107,14 @@ defmodule Expect.Matchers do
   def equal(value, :strict) do
     %CustomMatcher{
       name: "strictly equal #{inspect(value)}",
-      fn: fn given -> never_fails_matcher(given === value) end
+      fn: fn given -> success_result(given === value) end
     }
   end
 
   def equal(value, _opts) do
     %CustomMatcher{
       name: "equal #{inspect(value)}",
-      fn: fn given -> never_fails_matcher(given == value) end
+      fn: fn given -> success_result(given == value) end
     }
   end
 
@@ -130,7 +130,7 @@ defmodule Expect.Matchers do
 
   defp verify_greater_than(lhs, rhs)
        when (is_integer(lhs) or is_float(lhs)) and (is_integer(rhs) or is_float(rhs)) do
-    never_fails_matcher(lhs > rhs)
+    success_result(lhs > rhs)
   end
 
   defp verify_greater_than(_lhs, _rhs),
@@ -148,7 +148,7 @@ defmodule Expect.Matchers do
 
   defp verify_less_than(lhs, rhs)
        when (is_integer(lhs) or is_float(lhs)) and (is_integer(rhs) or is_float(rhs)) do
-    never_fails_matcher(lhs < rhs)
+    success_result(lhs < rhs)
   end
 
   defp verify_less_than(_lhs, _rhs),
@@ -190,7 +190,7 @@ defmodule Expect.Matchers do
     %CustomMatcher{
       name: "only contain #{inspect(one_value)}",
       fn: fn given when is_list(given) ->
-        never_fails_matcher(length(given) == 1 and one_value in given)
+        success_result(length(given) == 1 and one_value in given)
       end
     }
   end
@@ -200,7 +200,7 @@ defmodule Expect.Matchers do
       name: "only contain #{inspect(values)}",
       fn: fn
         given ->
-          never_fails_matcher(given == values)
+          success_result(given == values)
       end
     }
   end
@@ -210,7 +210,7 @@ defmodule Expect.Matchers do
       name: "only contain #{inspect(values)} (regardless of order)",
       fn: fn
         given ->
-          never_fails_matcher(MapSet.new(given) == MapSet.new(values))
+          success_result(MapSet.new(given) == MapSet.new(values))
       end
     }
   end
@@ -218,7 +218,7 @@ defmodule Expect.Matchers do
   def contain(value) do
     %CustomMatcher{
       name: "contain #{inspect(value)}",
-      fn: fn given -> never_fails_matcher(value in given) end
+      fn: fn given -> success_result(value in given) end
     }
   end
 
@@ -231,7 +231,7 @@ defmodule Expect.Matchers do
   end
 
   defp verify_in_range(range, given) when is_integer(given) do
-    never_fails_matcher(given in range)
+    success_result(given in range)
   end
 
   defp verify_in_range(_range, given),
@@ -243,14 +243,14 @@ defmodule Expect.Matchers do
     %CustomMatcher{name: "be empty", fn: &empty?/1}
   end
 
-  defp empty?([]), do: never_fails_matcher(true)
-  defp empty?([_ | _rest] = _list), do: never_fails_matcher(false)
+  defp empty?([]), do: success_result(true)
+  defp empty?([_ | _rest] = _list), do: success_result(false)
 
-  defp empty?({}), do: never_fails_matcher(true)
-  defp empty?(tuple) when is_tuple(tuple), do: never_fails_matcher(false)
+  defp empty?({}), do: success_result(true)
+  defp empty?(tuple) when is_tuple(tuple), do: success_result(false)
 
-  defp empty?(map) when is_map(map) and map_size(map) == 0, do: never_fails_matcher(true)
-  defp empty?(map) when is_map(map), do: never_fails_matcher(false)
+  defp empty?(map) when is_map(map) and map_size(map) == 0, do: success_result(true)
+  defp empty?(map) when is_map(map), do: success_result(false)
 
   defp empty?(_otherwise), do: error_result("it's not a list, map, or tuple.")
 
@@ -259,7 +259,7 @@ defmodule Expect.Matchers do
   def match_regex(regex) do
     %CustomMatcher{
       name: "match regex #{inspect(regex)}",
-      fn: fn given -> Regex.match?(regex, given) |> never_fails_matcher() end
+      fn: fn given -> Regex.match?(regex, given) |> success_result() end
     }
   end
 
@@ -274,7 +274,7 @@ defmodule Expect.Matchers do
           false -> false
           _ -> true
         end
-        |> never_fails_matcher()
+        |> success_result()
       end
     }
   end
@@ -285,8 +285,8 @@ defmodule Expect.Matchers do
     %CustomMatcher{
       name: "be nil",
       fn: fn
-        nil -> never_fails_matcher(true)
-        _otherwise -> never_fails_matcher(false)
+        nil -> success_result(true)
+        _otherwise -> success_result(false)
       end
     }
   end
@@ -304,14 +304,14 @@ defmodule Expect.Matchers do
        when is_list(list) and is_integer(expected_length) do
     actual_length = length(list)
 
-    never_fails_matcher(actual_length == expected_length)
+    success_result(actual_length == expected_length)
   end
 
   defp verify_length(binary, expected_length)
        when is_binary(binary) and is_integer(expected_length) do
     actual_length = String.length(binary)
 
-    (actual_length == expected_length) |> never_fails_matcher()
+    (actual_length == expected_length) |> success_result()
   end
 
   defp verify_length(_given, expected_length) when not is_integer(expected_length) do
@@ -329,16 +329,16 @@ defmodule Expect.Matchers do
       name: "be an error tuple",
       fn: fn
         :error ->
-          never_fails_matcher(true)
+          success_result(true)
 
         {:error, _anything} ->
-          never_fails_matcher(true)
+          success_result(true)
 
         tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
           error_result("it was neither :error or {:error, something}")
 
         _otherwise ->
-          never_fails_matcher(false)
+          success_result(false)
       end
     }
   end
@@ -383,7 +383,7 @@ defmodule Expect.Matchers do
 
   # # # Private
 
-  defp never_fails_matcher(successful?) when is_boolean(successful?) do
+  defp success_result(successful?) when is_boolean(successful?) do
     %Result{succeeded?: successful?}
   end
 
