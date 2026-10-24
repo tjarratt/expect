@@ -177,11 +177,11 @@ defmodule Expect.Matchers do
 
   ```
   # passes
-  expect([1, 2, 3], to: contain(elements: [1,2]))
-  expect([1, 2, 3], to: contain(elements: [2,1], in_any_order: true))
+  expect([1, 2, 3], to: contain(only: [1, 2]))
+  expect([1, 2, 3], to: contain(only: [2, 1], in_any_order: true))
 
   # fails
-  expect([1, 2, 3], to: contain(elements: [2,1]))
+  expect([1, 2, 3], to: contain(only: [2, 1]))
   ```
   """
   @spec contain(any()) :: t()
