@@ -98,7 +98,7 @@ defmodule Expect do
     given_as_string = Macro.to_string(given)
     given_no_bindings = ignoring_bindings(given)
 
-    quote do
+    quote generated: true do
       try do
         unquote(given_no_bindings) = unquote(actual)
       rescue
@@ -119,7 +119,7 @@ defmodule Expect do
   defmacro expect(given, to_not: {:pattern_match, _where, [actual]}) do
     given_as_string = Macro.to_string(given)
 
-    quote do
+    quote generated: true do
       try do
         unquote(given) = unquote(actual)
 

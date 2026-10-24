@@ -3,6 +3,8 @@ defmodule Expect.MatchersTest do
   use ExUnit.Case, async: true
   use Expect
 
+  doctest Expect.Matchers
+
   alias Expect.AssertionError
 
   test "equal matcher" do

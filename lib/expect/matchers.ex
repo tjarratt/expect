@@ -99,7 +99,10 @@ defmodule Expect.Matchers do
 
   If you want to verify strict equality with `===` then use `strict: true`
 
-  `expect(1, to: equal(1.0, strict: true))`
+  ```
+  iex> expect(1, to: equal(1.0, strict: true))
+  :ok
+  ```
   """
   @spec equal(any(), Keyword.t()) :: t()
   def equal(value, opts \\ [])
@@ -120,6 +123,17 @@ defmodule Expect.Matchers do
 
   @doc """
   Verifies that `expected` is strictly greater than `value`, using `>`.
+
+  ```
+  iex> expect(1, to: be_greater_than(0))
+  :ok
+
+  iex> expect(1, to_not: be_greater_than(2))
+  :ok
+
+  iex> expect("whoops", to: be_greater_than(1))
+  ** (Expect.AssertionError) Expected "whoops" to be greater than 1, but matcher expects only integers or floats
+  ```
   """
   def be_greater_than(value) do
     %CustomMatcher{
@@ -159,17 +173,22 @@ defmodule Expect.Matchers do
 
   Works with any Enumerable type (eg: Lists, Keyword lists, Ranges, Maps, etc).
 
-  `expect([1,2,3], to: contain(1))`
+  ```
+  iex> expect([1,2,3], to: contain(1))
+  :ok
+  ```
 
   You can provide the keyword `:only` which verifies that the value
   passed to `contain/1` is the one and only value inside the given Enum.
 
   ```
   # passes
-  expect([1], to: contain(only: 1))
+  iex> expect([1], to: contain(only: 1))
+  :ok
 
   # fails
-  expect([1, 2, 3], to: contain(only: 1))
+  iex> expect([1, 2, 3], to: contain(only: 1))
+  ** (Expect.AssertionError) Expected [1, 2, 3] to only contain 1
   ```
 
   You can also verify that a given enum only contains a list of values,
@@ -177,11 +196,15 @@ defmodule Expect.Matchers do
 
   ```
   # passes
-  expect([1, 2, 3], to: contain(only: [1, 2]))
-  expect([1, 2, 3], to: contain(only: [2, 1], in_any_order: true))
+  iex> expect([1, 2, 3], to: contain(only: [1, 2, 3]))
+  :ok
+
+  iex> expect([1, 2, 3], to: contain(only: [3, 2, 1], in_any_order: true))
+  :ok
 
   # fails
-  expect([1, 2, 3], to: contain(only: [2, 1]))
+  iex> expect([1, 2, 3], to: contain(only: [2, 1]))
+  ** (Expect.AssertionError) Expected [1, 2, 3] to only contain [2, 1]
   ```
   """
   @spec contain(any()) :: t()
@@ -254,7 +277,14 @@ defmodule Expect.Matchers do
 
   defp empty?(_otherwise), do: error_result("it's not a list, map, or tuple.")
 
-  @doc "Matches `expected` against the provided regular expression using `Regex.match?`"
+  @doc """
+  Matches `expected` against the provided regular expression using `Regex.match?`
+
+  ```
+  iex> expect("good tests are worth their weight in gold", to: match_regex(~r[^good.+gold$]))
+  :ok
+  ```
+  """
   @spec match_regex(Regex.t()) :: t()
   def match_regex(regex) do
     %CustomMatcher{
@@ -322,7 +352,20 @@ defmodule Expect.Matchers do
     error_result("it is neither a list nor a string")
   end
 
-  @doc "Verifies that `expected` is either the atom `:error` or an error tuple"
+  @doc """
+  Verifies that `expected` is either the atom `:error` or an error tuple
+
+  ```
+  iex> expect(:error, to: be_an_error())
+  :ok
+
+  iex> expect({:error, "whoopsie doodle"}, to: be_an_error())
+  :ok
+
+  iex> expect(:ok, to: be_an_error())
+  ** (Expect.AssertionError) Expected :ok to be an error tuple
+  ```
+  """
   @spec be_an_error() :: t()
   def be_an_error() do
     %CustomMatcher{
@@ -349,14 +392,17 @@ defmodule Expect.Matchers do
     Verifies that the given value matches against the given pattern.
 
     ```
-    expect({:ok, _msg}, to: pattern_match({:ok, "this is fine"}))
+    iex> expect({:ok, _msg}, to: pattern_match({:ok, "this is fine"}))
+    {:ok, "this is fine"}
 
-    expect({:ok, _msg}, to: pattern_match({:error, "this is NOT fine !!!"}))
     # raises an error
+    iex> expect({:ok, _msg}, to: pattern_match({:error, "this is NOT fine !!!"}))
+    ** (Expect.AssertionError) Expected {:ok, _msg} to match pattern {:error, "this is NOT fine !!!"}, but it did not.
 
     # you can also pass in variables for the pattern
-    result = {:error, "oh gods everything is on fire"}
-    expect({:error, _reason}, to: pattern_match(result))
+    iex> result = {:error, "oh gods everything is on fire"}
+    iex> expect({:error, _reason}, to: pattern_match(result))
+    {:error, "oh gods everything is on fire"}
 
     # nb : you do not want to pass in variables for the given value
     # this test will never fail, as it effectively re-assigns the variable `whoops`
