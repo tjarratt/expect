@@ -160,33 +160,15 @@ defmodule Expect.MatchersTest do
 
     test "can verify that the value is the only one present" do
       expect([1], to: contain(only: 1))
+      expect([], to_not: contain(:anything))
+      expect([1], to_not: contain(2))
+
+      assert_raise AssertionError, "Expected [1] to only contain 2", fn ->
+        expect([1], to: contain(only: 2))
+      end
 
       assert_raise AssertionError, "Expected [1, 2, 3] to only contain 1", fn ->
         expect([1, 2, 3], to: contain(only: 1))
-      end
-    end
-
-    test "can verify that a list contains one or more elements" do
-      expect([1, 2, 3], to: contain(only: [1, 2, 3]))
-
-      # order matters by default
-      expect([1, 2, 3], to_not: contain(only: [3, 2, 1]))
-
-      # edge case, the semantics are that values in the list passed to`only:` should be treated as elements
-      # and the list is not treated as an element in itself, should the list contain nested lists
-      expect([[1, 2, 3]], to_not: contain(only: [1, 2, 3]))
-
-      # edgecase, while it does contain the list [1,2,3], it also contains elements 1, 2, AND 3
-      expect([1, 2, 3, [1, 2, 3]], to_not: contain(only: [1, 2, 3]))
-
-      # nb: keyword lists are actually just syntactic sugar for a list of tuples of size 2 {:key, value}
-      #     (this is why a keyword list can contain the same key multiple times, unlike a map)
-      expect([only: 1], to: contain({:only, 1}))
-      expect([only: 1, and: "this"], to: contain({:only, 1}))
-      expect([only: 1, but_not: "this"], to_not: contain(only: {:only, 1}))
-
-      assert_raise AssertionError, "Expected [1, 2, 3] to only contain [4, 5, 6]", fn ->
-        expect([1, 2, 3], to: contain(only: [4, 5, 6]))
       end
     end
   end

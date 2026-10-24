@@ -180,8 +180,8 @@ defmodule Expect.Matchers do
   :ok
   ```
 
-  You can provide the keyword `:only` which verifies that the value
-  passed to `contain/1` is the one and only value inside the given Enum.
+  You can optionally provide the keyword `:only` which verifies that the value
+  passed is the one and only value inside the given Enum.
 
   ```
   # passes
@@ -198,7 +198,7 @@ defmodule Expect.Matchers do
 
   ```
   # passes
-  iex> expect([1, 2, 3], to: contain(only: [1, 2, 3]))
+  iex> expect(["hello world"], to: contain(only: "hello world"))
   :ok
 
   # fails
@@ -206,23 +206,14 @@ defmodule Expect.Matchers do
   ** (Expect.AssertionError) Expected [1, 2, 3] to only contain [2, 1]
   ```
   """
+
   @spec contain(any()) :: t()
   @spec contain(only: any()) :: t()
-  def contain(only: one_value) when not is_list(one_value) do
+  def contain(only: one_value) do
     %CustomMatcher{
       name: "only contain #{inspect(one_value)}",
       fn: fn given when is_list(given) ->
         success_result(length(given) == 1 and one_value in given)
-      end
-    }
-  end
-
-  def contain(only: values) when is_list(values) do
-    %CustomMatcher{
-      name: "only contain #{inspect(values)}",
-      fn: fn
-        given ->
-          success_result(given == values)
       end
     }
   end
@@ -237,8 +228,7 @@ defmodule Expect.Matchers do
   @doc """
   Verifies that the provided list of `values` are in the Enum, regardless of order.
 
-  Unlike `contain/2`, this matcher does not care whether the elements appear in order
-  in the given enumerable.
+  Unlike contain/1 this allows for verifying more than one element at a time.
 
   ```
   iex> expect([1, 2, 3], to: contain_in_any_order([3, 2, 1]))
