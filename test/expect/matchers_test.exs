@@ -290,6 +290,11 @@ defmodule Expect.MatchersTest do
       expect([_, _, _], to: pattern_match([1, 2, 3]))
       expect({_a, _b}, to: pattern_match({:a, :b}))
       expect(%{year: 1999}, to: pattern_match(%Date{year: 1999, month: 12, day: 31}))
+
+      expect(%{hello: _whom}, to_not: pattern_match(%{goodbye: "sweet world"}))
+      expect([_not_enough], to_not: pattern_match([1, 2, 3]))
+      expect({_not_enough}, to_not: pattern_match({:a, :b}))
+      expect(%{whoops: _my_bad}, to_not: pattern_match(%Date{year: 1999, month: 12, day: 31}))
     end
 
     test "makes variables bound in the pattern match available for later assertions" do
@@ -302,6 +307,22 @@ defmodule Expect.MatchersTest do
       assert_raise AssertionError,
                    ~s[Expected %{hello: "whoopsie"} to match pattern %{hello: "world"}, but it did not.],
                    fn -> expect(%{hello: "whoopsie"}, to: pattern_match(%{hello: "world"})) end
+
+      assert_raise AssertionError,
+                   ~s[Expected %{hello: "world"} to not match pattern %{hello: "world"}, but it did.],
+                   fn -> expect(%{hello: "world"}, to_not: pattern_match(%{hello: "world"})) end
+
+      assert_raise AssertionError,
+                   ~s[Expected %{goodbye: _cruel_world} to match pattern %{hello: "world"}, but it did not.],
+                   fn ->
+                     expect(%{goodbye: _cruel_world}, to: pattern_match(%{hello: "world"}))
+                   end
+
+      assert_raise AssertionError,
+                   ~s[Expected %{goodbye: _cruel_world} to match pattern %{hello: "world"}, but it did not.],
+                   fn ->
+                     expect(%{goodbye: _cruel_world}, to: pattern_match(%{hello: "world"}))
+                   end
     end
   end
 

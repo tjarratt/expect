@@ -15,13 +15,9 @@ defmodule Expect.MixProject do
       description: "Write beautifully simple assertions for ExUnit using matchers",
       package: package(),
       source_url: @git_url,
-      homepage_url: @git_url,
-      test_paths: test_paths(System.get_env("INCLUDE_TESTS_WITH_WARNINGS"))
+      homepage_url: @git_url
     ]
   end
-
-  defp test_paths(nil), do: ["test"]
-  defp test_paths(_), do: ["test", "test_with_warnings"]
 
   def application() do
     [

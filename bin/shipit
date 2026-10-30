@@ -7,7 +7,6 @@ mix format
 (git diff --quiet && git diff --cached --quiet) || (echo "Unstaged changed detected. Aborting." && exit 1)
 
 mix check
-INCLUDE_TESTS_WITH_WARNINGS=true mix test
 
 git push origin HEAD
 git push origin --tags
