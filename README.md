@@ -123,23 +123,23 @@ Expect ships with quite a few built-in matchers for you to use in tests
 
 Here's a non-exhaustive list of features that are in our roadmap
 
-* be_equivalent `Date`, `Datetime` matchers
+* datetime `Date`, `Datetime` matchers
     * be_same_day (works with date, datetime)
-* be_temporally (eg: a date should occur before or after another)
+    * occur_at(hour: minute: second:)
+* be_temporally (eg: a `Date` should occur before or after another)
     * occur_after
     * occur_before
     * occur_on_or_after
     * occur_on_or_before
 * string matching (have prefix, have suffix, contain substring)
 * match yaml, json, or xml
-* contain elements with/without strict ordering
 * be element of some data structure
 * be struct of a given type
 * have key present in map
-* satisfy all, satisfy any, satisfy
-* Matchers can return an optional suffix when the match fails
-  * eg: "expected [1,2,3] to have length 99, but it was actually 3"
-  * "but it was actually 3" is an example of an optional suffix
+* `beCloseTo` matcher
+    * defaults to 0.1
+    * precision can be added
+* satisfy all, satisfy any for combining matchers
 
 Many of these features can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers)
 
