@@ -32,6 +32,48 @@ expect(subject.answer, to: be_the_answer_to_life_the_universe_and_everything_els
 
 See the documentation on `Expect.Matchers` for more examples of matchers to use.
 
+## Avoiding tests that pass erroneously
+
+Sometimes we accidentally write tests that don't test anything meaningful. Consider
+the following test:
+
+```elixir
+test "widget names follow the 'Manufacturer - Year - Name' convention" do
+    widgets = Tools.widgets()
+
+    for widget <- widgets do
+       assert Regex.scan(~r/([A-Za-z]+) - ([0-9]+) - ([A-Za-z]+)/, widget.name) 
+    end
+end
+```
+
+This test is bad because `Regex.scan/2` either returns an array of matches, or an empty list `[]`.
+This variant of the test also would pass.
+
+```elixir
+test "widget names follow the 'Manufacturer - Year - Name' convention" do
+    for widget <- widgets do
+       assert Regex.scan(~r/([A-Za-z]+) - ([0-9]+) - ([A-Za-z]+)/, "this should not pass, but does") 
+    end
+end
+```
+
+The problem is that `assert` on its only will only verify that the value is neither `false` nor `nil`.
+A matcher from `Expect` encapsulates the behaviour it cares about, and verifies it directly.
+We could thus rewrite our test using the `match_regex` matcher:
+
+```elixir
+test "widget names follow the 'Manufacturer - Year - Name' convention" do
+    widgets = Tools.widgets()
+
+    for widget <- widgets do
+       expect(widget.name, to: match_regex(~r/([A-Za-z]+) - ([0-9]+) - ([A-Za-z]+)/))
+    end
+end
+```
+
+Matchers increase legibility of tests and make it harder to introduce these types of errors.
+
 ## Installation
 
 Add `expect` to your list of dependencies in `mix.exs` :
@@ -59,47 +101,6 @@ defmodule MyApp.PoetryTest do
         expect(poem.body, to: match_regex(~r"gyre and gimble"))
     end
 end
-```
-
-## Custom Matchers
-
-You are highly encouraged to implement your own custom matchers. For the application you
-will build, there will surely be some interesting properties and shapes of data that
-will be important to verify. It might be easy to use the `equal()` matcher for 99%
-of assertions, but writing a higher-level matcher can be much more intent revealing.
-
-Imagine we are building an application that provides users with the highest quality
-bananas that money can buy. As part of our unit testing, it's crucial that we can
-verify that the output of our system is indeed a banana. It would be valuable to
-implement a `be_bananas()` matcher, as depending on the market the user is in
-the type of banana we supply them will vary (maybe they prefer it more or less ripe). 
-
-A simple version of our custom bananas matcher could look like this
-
-```elixir
-defmodule MyFancyMatchers do
-    alias Expect.Matchers.CustomMatcher
-
-    def be_bananas() do
-       %CustomMatcher{
-            name: "be bananas",
-            fn: fn given ->
-                case given do
-                    "bananas" -> true
-                    "BANANAS" -> true
-                    "🍌" ->      true
-
-                    _ -> false
-                end
-            end
-       }
-    end
-end
-
-use Expect
-import MyFancyMatchers
-
-expect("🍌", to: be_bananas())
 ```
 
 For more details see the documentation for `Expect.Matchers`.
@@ -143,7 +144,48 @@ Here's a non-exhaustive list of features that are in our roadmap
 
 Many of these features can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers)
 
+## Custom Matchers
+
+You are highly encouraged to implement your own custom matchers. For the application you
+will build, there will surely be some interesting properties and shapes of data that
+will be important to verify. It might be easy to use the `equal()` matcher for 99%
+of assertions, but writing a higher-level matcher can be much more intent revealing.
+
+Imagine we are building an application that provides users with the highest quality
+bananas that money can buy. As part of our unit testing, it's crucial that we can
+verify that the output of our system is indeed a banana. It would be valuable to
+implement a `be_bananas()` matcher, as depending on the market the user is in
+the type of banana we supply them will vary (maybe they prefer it more or less ripe). 
+
+A simple version of our custom bananas matcher could look like this
+
+```elixir
+defmodule MyFancyMatchers do
+    alias Expect.Matchers.CustomMatcher
+
+    def be_bananas() do
+       %CustomMatcher{
+            name: "be bananas",
+            fn: fn given ->
+                case given do
+                    "bananas" -> true
+                    "BANANAS" -> true
+                    "🍌" ->      true
+
+                    _ -> false
+                end
+            end
+       }
+    end
+end
+
+use Expect
+import MyFancyMatchers
+
+expect("🍌", to: be_bananas())
+```
+
 ## Docs
 
-<https://hexdocs.pm/expect>.
+<https://hexdocs.pm/expect>
 
