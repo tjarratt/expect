@@ -443,6 +443,52 @@ defmodule Expect.Matchers do
     success_result(is_same)
   end
 
+  @doc """
+  Verifies that the given `DateTime` or `NaiveDateTime` occurs at the expected time.
+
+  ```
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_at(hour: 23))
+  :ok
+  ```
+
+  You can specify any of `:hour`, `:minute`, and or `:second` level precision in the opts
+
+  ```
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_at(hour: 23))
+  :ok
+
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_at(minute: 55))
+  :ok
+
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_at(second: 59))
+  :ok
+  ```
+  """
+  @spec occur_at(Keyword.t()) :: t()
+  def occur_at(opts) do
+    hour = Keyword.get(opts, :hour, :skip)
+    minute = Keyword.get(opts, :minute, :skip)
+    second = Keyword.get(opts, :second, :skip)
+
+    %CustomMatcher{
+      name: "occur at #{inspect(opts)}",
+      fn: fn date ->
+        matched =
+          verify_occurs_at(date.hour, hour) and
+            verify_occurs_at(date.minute, minute) and
+            verify_occurs_at(date.second, second)
+
+        success_result(matched)
+      end
+    }
+  end
+
+  defp verify_occurs_at(_component, :skip), do: true
+
+  defp verify_occurs_at(component, expected_value) do
+    component == expected_value
+  end
+
   # # # Pattern matching
 
   @doc """

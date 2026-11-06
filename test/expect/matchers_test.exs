@@ -434,4 +434,28 @@ defmodule Expect.MatchersTest do
                    end
     end
   end
+
+  describe "occur_at matcher" do
+    test "succeeds when the provided date occurs at the provided time" do
+      expect(~N[2026-01-01 16:20:00], to: occur_at(hour: 16))
+      expect(~U[2026-01-01 16:20:00Z], to: occur_at(hour: 16))
+
+      expect(~N[2026-01-01 16:20:00], to_not: occur_at(hour: 23))
+      expect(~U[2026-01-01 16:20:00Z], to_not: occur_at(hour: 23))
+    end
+
+    test "permits hour, minute, and second level precision" do
+      expect(~N[2026-01-01 16:20:44], to: occur_at(hour: 16))
+      expect(~N[2026-01-01 16:20:44], to_not: occur_at(hour: 17))
+
+      expect(~N[2026-01-01 16:20:44], to: occur_at(minute: 20))
+      expect(~N[2026-01-01 16:20:44], to_not: occur_at(minute: 21))
+
+      expect(~N[2026-01-01 16:20:44], to: occur_at(second: 44))
+      expect(~N[2026-01-01 16:20:44], to_not: occur_at(second: 45))
+
+      expect(~N[2026-01-01 16:20:44], to: occur_at(hour: 16, minute: 20, second: 44))
+      expect(~N[2026-01-01 16:20:44], to_not: occur_at(hour: 16, minute: 19, second: 43))
+    end
+  end
 end
