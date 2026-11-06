@@ -492,7 +492,7 @@ defmodule Expect.Matchers do
   # # # Pattern matching
 
   @doc """
-  Verifies that the given value matches against the given pattern.
+  Verifies that the given value matches against the provided pattern.
 
   ```
   iex> expect({:ok, _msg}, to: pattern_match({:ok, "this is fine"}))
