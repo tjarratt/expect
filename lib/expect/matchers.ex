@@ -18,7 +18,6 @@ end
 
 defmodule Expect.Matchers do
   # @related [tests](test/expect/matchers_test.exs)
-  # @related [tests with warnings](test_with_warnings/expect/matchers/warnings_test.exs)
 
   alias Expect.Matchers.CustomMatcher
   alias Expect.Matchers.ErrorResult
