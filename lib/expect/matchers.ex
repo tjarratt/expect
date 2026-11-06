@@ -411,23 +411,17 @@ defmodule Expect.Matchers do
   :ok
   ```
   """
-  @spec be_same_day(term()) :: t()
+  @spec be_same_day(Date.t() | DateTime.t() | NaiveDateTime.t()) :: t()
   def be_same_day(%Date{} = date), do: do_be_same_day(date)
   def be_same_day(%DateTime{} = datetime), do: do_be_same_day(datetime)
   def be_same_day(%NaiveDateTime{} = datetime), do: do_be_same_day(datetime)
-
-  def be_same_day(otherwise) do
-    %CustomMatcher{
-      name: "be the same day as #{inspect(otherwise)}",
-      fn: fn _given -> error_result("the matcher term was neither a Date nor a DateTime") end
-    }
-  end
 
   defp do_be_same_day(date_to_match) do
     %CustomMatcher{
       name: "be the same day as #{inspect(date_to_match)}",
       fn: fn
         %Date{} = date -> are_same_day(date_to_match, date)
+        %NaiveDateTime{} = datetime -> are_same_day(date_to_match, datetime)
         %DateTime{} = datetime -> are_same_day(date_to_match, datetime)
         _otherwise -> error_result("the given term was neither a Date nor a DateTime")
       end

@@ -413,9 +413,12 @@ defmodule Expect.MatchersTest do
       expect(~D[2026-12-30], to_not: be_same_day(~D[2027-12-30]))
     end
 
-    test "works with Dates and DateTimes" do
-      expect(~D[2026-12-30], to: be_same_day(~N[2026-12-30 10:00:00]))
-      expect(~D[2026-12-30], to: be_same_day(~U[2026-12-30 00:00:00Z]))
+    test "works with Dates, DateTimes, and NaiveDateTimes" do
+      expect(~D[2026-12-31], to: be_same_day(~N[2026-12-31 10:00:00]))
+      expect(~D[2026-12-31], to: be_same_day(~U[2026-12-31 13:00:00Z]))
+
+      expect(~N[1999-12-31 10:00:00], to: be_same_day(~D[1999-12-31]))
+      expect(~U[1999-12-31 10:00:00Z], to: be_same_day(~D[1999-12-31]))
     end
 
     test "fails with a useful message when the given term is not a Date or DateTime" do
@@ -423,14 +426,6 @@ defmodule Expect.MatchersTest do
                    ~s<Expected :whoops to be the same day as ~D[2000-01-01], but the given term was neither a Date nor a DateTime>,
                    fn ->
                      expect(:whoops, to: be_same_day(~D[2000-01-01]))
-                   end
-    end
-
-    test "fails with a useful message when the matcher term is not a Date or DateTime" do
-      assert_raise AssertionError,
-                   ~s<Expected ~D[2000-01-01] to be the same day as :oh_noes, but the matcher term was neither a Date nor a DateTime>,
-                   fn ->
-                     expect(~D[2000-01-01], to: be_same_day(:oh_noes))
                    end
     end
   end
