@@ -457,5 +457,21 @@ defmodule Expect.MatchersTest do
       expect(~N[2026-01-01 16:20:44], to: occur_at(hour: 16, minute: 20, second: 44))
       expect(~N[2026-01-01 16:20:44], to_not: occur_at(hour: 16, minute: 19, second: 43))
     end
+
+    test "fails with a useful message when it does not match" do
+      assert_raise AssertionError,
+                   "Expected ~N[2000-01-30 23:44:55] to occur at [hour: 1, minute: 1, second: 1]",
+                   fn ->
+                     expect(~N[2000-01-30 23:44:55], to: occur_at(hour: 1, minute: 1, second: 1))
+                   end
+    end
+
+    test "fails with a useful message when the given term is not a DateTime" do
+      assert_raise AssertionError,
+                   ~s"Expected :whoops to occur at [hour: 1], but it was neither a DateTime nor a NaiveDateTime",
+                   fn ->
+                     expect(:whoops, to: occur_at(hour: 1))
+                   end
+    end
   end
 end

@@ -465,29 +465,32 @@ defmodule Expect.Matchers do
   ```
   """
   @spec occur_at(Keyword.t()) :: t()
-  def occur_at(opts) do
-    hour = Keyword.get(opts, :hour, :skip)
-    minute = Keyword.get(opts, :minute, :skip)
-    second = Keyword.get(opts, :second, :skip)
-
+  def occur_at(opts) when is_list(opts) do
     %CustomMatcher{
       name: "occur at #{inspect(opts)}",
-      fn: fn date ->
-        matched =
-          verify_occurs_at(date.hour, hour) and
-            verify_occurs_at(date.minute, minute) and
-            verify_occurs_at(date.second, second)
-
-        success_result(matched)
+      fn: fn
+        %DateTime{} = given -> do_occur_at(given, opts)
+        %NaiveDateTime{} = given -> do_occur_at(given, opts)
+        _otherwise -> error_result("it was neither a DateTime nor a NaiveDateTime")
       end
     }
   end
 
-  defp verify_occurs_at(_component, :skip), do: true
+  defp do_occur_at(datetime, opts) do
+    hour = Keyword.get(opts, :hour, :skip_it)
+    minute = Keyword.get(opts, :minute, :skip_it)
+    second = Keyword.get(opts, :second, :skip_it)
 
-  defp verify_occurs_at(component, expected_value) do
-    component == expected_value
+    matched =
+      verify_occurs_at(datetime.hour, hour) and
+        verify_occurs_at(datetime.minute, minute) and
+        verify_occurs_at(datetime.second, second)
+
+    success_result(matched)
   end
+
+  defp verify_occurs_at(_component, :skip_it), do: true
+  defp verify_occurs_at(component, expected_value), do: component == expected_value
 
   # # # Pattern matching
 
