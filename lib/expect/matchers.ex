@@ -492,39 +492,39 @@ defmodule Expect.Matchers do
   # # # Pattern matching
 
   @doc """
-    Verifies that the given value matches against the given pattern.
+  Verifies that the given value matches against the given pattern.
 
-    ```
-    iex> expect({:ok, _msg}, to: pattern_match({:ok, "this is fine"}))
-    {:ok, "this is fine"}
+  ```
+  iex> expect({:ok, _msg}, to: pattern_match({:ok, "this is fine"}))
+  {:ok, "this is fine"}
 
-    # raises an error
-    iex> expect({:ok, _msg}, to: pattern_match({:error, "this is NOT fine !!!"}))
-    ** (Expect.AssertionError) Expected {:ok, _msg} to match pattern {:error, "this is NOT fine !!!"}, but it did not.
+  # raises an error
+  iex> expect({:ok, _msg}, to: pattern_match({:error, "this is NOT fine !!!"}))
+  ** (Expect.AssertionError) Expected {:ok, _msg} to match pattern {:error, "this is NOT fine !!!"}, but it did not.
 
-    # you can also pass in variables for the pattern
-    iex> result = {:error, "oh gods everything is on fire"}
-    iex> expect({:error, _reason}, to: pattern_match(result))
-    {:error, "oh gods everything is on fire"}
+  # you can also pass in variables for the pattern
+  iex> result = {:error, "oh gods everything is on fire"}
+  iex> expect({:error, _reason}, to: pattern_match(result))
+  {:error, "oh gods everything is on fire"}
 
-    # nb : you do not want to pass in variables for the given value
-    # this test will never fail, as it effectively re-assigns the variable `whoops`
-    whoops = :ok
-    expect(whoops, to: pattern_match(:error))
-    ```
+  # nb : you do not want to pass in variables for the given value
+  # this test will never fail, as it effectively re-assigns the variable `whoops`
+  whoops = :ok
+  expect(whoops, to: pattern_match(:error))
+  ```
 
-    ## Binding variables
+  ## Binding variables
 
-    You can bind variables during a pattern match and use that for later assertions.
-    This is frequently helpful when you have some large data structure and assert several
-    distinct facts about it
+  You can bind variables during a pattern match and use that for later assertions.
+  This is frequently helpful when you have some large data structure and assert several
+  distinct facts about it
 
-    ```
-    my_data = %{large: %{structure: %{containing: %{a_list: ["cool"]}}}}
+  ```
+  my_data = %{large: %{structure: %{containing: %{a_list: ["cool"]}}}}
 
-    expect(%{large: %{structure: %{containing: %{a_list: list}}}}, to: pattern_match(my_data))
-    expect(list, to: contain("cool"))
-    ```
+  expect(%{large: %{structure: %{containing: %{a_list: list}}}}, to: pattern_match(my_data))
+  expect(list, to: contain("cool"))
+  ```
   """
   defmacro pattern_match(expected) do
     {:pattern_match, expected}
