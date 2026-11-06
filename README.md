@@ -132,7 +132,10 @@ Here's a non-exhaustive list of features that are in our roadmap
     * occur_before
     * occur_on_or_after
     * occur_on_or_before
-* string matching (have prefix, have suffix, contain substring)
+* string matching 
+    * have_prefix
+    * have suffix
+    * contain_substring
 * match yaml, json, or xml
 * be element of some data structure
 * be struct of a given type
