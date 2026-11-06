@@ -398,6 +398,51 @@ defmodule Expect.Matchers do
     }
   end
 
+  @doc """
+  Verifies that `expected` occurs on the same calendar day (day, month, year) as the provided date.
+
+  Accepts either `Date` or `DateTime` values.
+
+  ```
+  iex> expect(~D[2000-12-30], to: be_same_day(~D[2000-12-30]))
+  :ok
+
+  iex> expect(~D[2000-12-30], to_not: be_same_day(~D[2000-01-01]))
+  :ok
+  ```
+  """
+  @spec be_same_day(term()) :: t()
+  def be_same_day(%Date{} = date), do: do_be_same_day(date)
+  def be_same_day(%DateTime{} = datetime), do: do_be_same_day(datetime)
+  def be_same_day(%NaiveDateTime{} = datetime), do: do_be_same_day(datetime)
+
+  def be_same_day(otherwise) do
+    %CustomMatcher{
+      name: "be the same day as #{inspect(otherwise)}",
+      fn: fn _given -> error_result("the matcher term was neither a Date nor a DateTime") end
+    }
+  end
+
+  defp do_be_same_day(date_to_match) do
+    %CustomMatcher{
+      name: "be the same day as #{inspect(date_to_match)}",
+      fn: fn
+        %Date{} = date -> are_same_day(date_to_match, date)
+        %DateTime{} = datetime -> are_same_day(date_to_match, datetime)
+        _otherwise -> error_result("the given term was neither a Date nor a DateTime")
+      end
+    }
+  end
+
+  defp are_same_day(given_date, date) do
+    is_same =
+      given_date.year == date.year &&
+        given_date.month == date.month &&
+        given_date.day == date.day
+
+    success_result(is_same)
+  end
+
   # # # Pattern matching
 
   @doc """
