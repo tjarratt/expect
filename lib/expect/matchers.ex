@@ -376,6 +376,16 @@ defmodule Expect.Matchers do
 
   iex> expect(:ok, to: be_an_error())
   ** (Expect.AssertionError) Expected :ok to be an error tuple
+
+  ## Options
+
+  You can optionally pass `:reason` as an option, which will verify the error tuple includes that reason.
+
+  iex> expect({:error, "critical failure"}, to: be_an_error(reason: "critical failure"))
+  :ok
+
+  iex> expect(:ok, to: be_an_error(reason: "spawn more overlords"))
+  ** (Expect.AssertionError) Expected :ok to be an error tuple with reason "spawn more overlords"
   ```
   """
   @spec be_an_error() :: t()
@@ -388,6 +398,26 @@ defmodule Expect.Matchers do
 
         {:error, _anything} ->
           success_result(true)
+
+        tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
+          error_result("it was neither :error or {:error, something}")
+
+        _otherwise ->
+          success_result(false)
+      end
+    }
+  end
+
+  @spec be_an_error(reason: term()) :: t()
+  def be_an_error(reason: expected_reason) do
+    %CustomMatcher{
+      name: "be an error tuple with reason #{inspect(expected_reason)}",
+      fn: fn
+        :error ->
+          success_result(false)
+
+        {:error, given_reason} ->
+          success_result(given_reason == expected_reason)
 
         tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
           error_result("it was neither :error or {:error, something}")

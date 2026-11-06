@@ -389,6 +389,19 @@ defmodule Expect.MatchersTest do
       expect({:error, "oh noes"}, to: be_an_error())
     end
 
+    test "allows you to pass in an optional message" do
+      expect({:error, "oh noes"}, to: be_an_error(reason: "oh noes"))
+      expect({:error, "it's probably fine"}, to_not: be_an_error(reason: "critical alert"))
+    end
+
+    test "fails with a useful error message when you specified a reason, but it there was no reason given" do
+      assert_raise AssertionError,
+                   ~s[Expected {:ok, "it's a refrigerator"} to be an error tuple with reason "is it on?"],
+                   fn ->
+                     expect({:ok, "it's a refrigerator"}, to: be_an_error(reason: "is it on?"))
+                   end
+    end
+
     test "fails when the actual is not an error tuple" do
       assert_raise AssertionError, ~s[Expected {:ok, "s'all good"} to be an error tuple], fn ->
         expect({:ok, "s'all good"}, to: be_an_error())
