@@ -117,17 +117,17 @@ Expect ships with quite a few built-in matchers for you to use in tests
 * be truthy
 * be nil
 * have length
-* be error
+* be an error
 * match pattern (eg: `assert %{key: value} = %{key: "value"}`)
+* datetime `Date`, `Datetime` matchers
+    * be_same_day (works with date, datetime)
+    * occur_at(hour: minute: second:)
 
 ## Roadmap
 
 Here's a non-exhaustive list of features that are in our roadmap
 
-* datetime `Date`, `Datetime` matchers
-    * be_same_day (works with date, datetime)
-    * occur_at(hour: minute: second:)
-* be_temporally (eg: a `Date` should occur before or after another)
+* Temporal matchers (eg: a `Date` should occur before or after another)
     * occur_after
     * occur_before
     * occur_on_or_after
