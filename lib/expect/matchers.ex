@@ -414,13 +414,13 @@ defmodule Expect.Matchers do
       name: "be an error tuple with reason #{inspect(expected_reason)}",
       fn: fn
         :error ->
-          success_result(false)
+          error_result("it was not a tuple")
 
         {:error, given_reason} ->
           success_result(given_reason == expected_reason)
 
         tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
-          error_result("it was neither :error or {:error, something}")
+          error_result("it was not {:error, #{inspect(expected_reason)}}")
 
         _otherwise ->
           success_result(false)

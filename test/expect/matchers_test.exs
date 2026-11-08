@@ -396,9 +396,21 @@ defmodule Expect.MatchersTest do
 
     test "fails with a useful error message when you specified a reason, but it there was no reason given" do
       assert_raise AssertionError,
+                   ~s[Expected :error to be an error tuple with reason "whoopsie", but it was not a tuple],
+                   fn ->
+                     expect(:error, to: be_an_error(reason: "whoopsie"))
+                   end
+
+      assert_raise AssertionError,
                    ~s[Expected {:ok, "it's a refrigerator"} to be an error tuple with reason "is it on?"],
                    fn ->
                      expect({:ok, "it's a refrigerator"}, to: be_an_error(reason: "is it on?"))
+                   end
+
+      assert_raise AssertionError,
+                   ~s[Expected {:error, "oh no", "im too big"} to be an error tuple with reason "oh no", but it was not {:error, "oh no"}],
+                   fn ->
+                     expect({:error, "oh no", "im too big"}, to: be_an_error(reason: "oh no"))
                    end
     end
 
