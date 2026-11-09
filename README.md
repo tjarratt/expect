@@ -136,6 +136,7 @@ Here's a non-exhaustive list of features that are in our roadmap
     * have_prefix
     * have suffix
     * contain_substring
+* satisfy all, satisfy any for combining matchers
 * match yaml, json, or xml
 * be element of some data structure
 * be struct of a given type
@@ -143,7 +144,6 @@ Here's a non-exhaustive list of features that are in our roadmap
 * `beCloseTo` matcher
     * defaults to 0.1
     * precision can be added
-* satisfy all, satisfy any for combining matchers
 
 Many of these features can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers)
 
