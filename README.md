@@ -120,15 +120,15 @@ Expect ships with quite a few built-in matchers for you to use in tests
 * be an error
 * match pattern (eg: `assert %{key: value} = %{key: "value"}`)
 * datetime `Date`, `Datetime` matchers
-    * be_same_day (works with date, datetime)
+    * be_same_day (works with Date, Datetime, NaiveDateTime)
     * occur_at(hour: minute: second:)
+    * occur_after (works with Dates, DateTime, NaiveDateTime)
 
 ## Roadmap
 
 Here's a non-exhaustive list of features that are in our roadmap
 
-* Temporal matchers (eg: a `Date` should occur before or after another)
-    * occur_after
+* additional temporal matchers (eg: a `Date` should occur before or after another)
     * occur_before
     * occur_on_or_after
     * occur_on_or_before
