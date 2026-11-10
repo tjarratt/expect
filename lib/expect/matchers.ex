@@ -428,6 +428,8 @@ defmodule Expect.Matchers do
     }
   end
 
+  # # # Date and DateTime matchers
+
   @doc """
   Verifies that `expected` occurs on the same calendar day (day, month, year) as the provided date.
 
@@ -515,6 +517,138 @@ defmodule Expect.Matchers do
 
   defp verify_occurs_at(_component, :skip_it), do: true
   defp verify_occurs_at(component, expected_value), do: component == expected_value
+
+  @doc """
+  Verifies that the given `Date`, `DateTime` or `NaiveDateTime` occurs strictly after the expected Date or DateTime.
+
+  Works the way you expect when comparing Dates against DateTimes, with the caveat that you cannot compare `DateTime` against `NaiveDateTime`. See notes below.
+
+  ```
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_after(~D[1999-01-01]))
+  :ok
+
+  iex> expect(~N[2000-12-31 23:55:59], to: occur_after(~D[1999-01-01]))
+  :ok
+
+  iex> expect(~D[2000-12-31], to: occur_after(~D[1999-01-01]))
+  :ok
+
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_after(~U[1999-01-01 00:00:00Z]))
+  :ok
+
+  iex> expect(~D[2000-12-31], to: occur_after(~U[1999-01-01 00:00:00Z]))
+  :ok
+
+  iex> expect(~N[2000-12-31 23:55:59Z], to: occur_after(~N[1999-01-01 00:00:00]))
+  :ok
+
+  iex> expect(~D[2000-12-31], to: occur_after(~N[1999-01-01 00:00:00]))
+  :ok
+  ```
+
+  ## Do not compare DateTime against NaiveDateTime
+
+  For the same reasons of correctness that the elixir standard library doesn't allow you to compare `DateTime` against `NaiveDateTime`, expect's temporal matchers refuse to make such comparisons.
+
+  It's always safe to compare DateTime (with or without timezone) against Dates, but comparing DateTime with timezone against one is not well defined, and can lead to subtle bugs.
+
+  ```
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_after(~N[1999-01-01 00:00:00]))
+  ** (Expect.AssertionError) Expected ~U[2000-12-31 23:55:59Z] to occur after ~N[1999-01-01 00:00:00], but it is dangerous to compare DateTime against NaiveDateTime...
+  ```
+  """
+  @spec occur_after(Date.t() | DateTime.t() | NaiveDateTime.t()) :: t()
+  def occur_after(%NaiveDateTime{} = expected_datetime) do
+    %CustomMatcher{
+      name: "occur after #{inspect(expected_datetime)}",
+      fn: &compare_datetime(&1, expected_datetime)
+    }
+  end
+
+  def occur_after(%DateTime{} = expected_datetime) do
+    %CustomMatcher{
+      name: "occur after #{inspect(expected_datetime)}",
+      fn: &compare_datetime(&1, expected_datetime)
+    }
+  end
+
+  @impossible_occur_after_condition "it was neither a Date, DateTime, nor NaiveDateTime"
+
+  def occur_after(%Date{} = expected_date) do
+    %CustomMatcher{
+      name: "occur after #{inspect(expected_date)}",
+      fn: fn
+        %NaiveDateTime{} = given -> compare_date(given, expected_date)
+        %DateTime{} = given -> compare_date(given, expected_date)
+        %Date{} = given -> compare_date(given, expected_date)
+        _otherwise -> error_result(@impossible_occur_after_condition)
+      end
+    }
+  end
+
+  defp compare_date(given, expected_date) do
+    case Date.compare(given, expected_date) do
+      :eq -> success_result(false)
+      :lt -> success_result(false)
+      :gt -> success_result(true)
+    end
+  end
+
+  defp compare_datetime(%NaiveDateTime{} = given, %NaiveDateTime{} = expected) do
+    case NaiveDateTime.compare(given, expected) do
+      :eq -> success_result(false)
+      :lt -> success_result(false)
+      :gt -> success_result(true)
+    end
+  end
+
+  defp compare_datetime(%Date{} = given, %NaiveDateTime{} = expected) do
+    given_datetime = NaiveDateTime.new!(given, ~T[00:00:00])
+
+    case NaiveDateTime.compare(given_datetime, expected) do
+      :eq -> success_result(false)
+      :lt -> success_result(false)
+      :gt -> success_result(true)
+    end
+  end
+
+  @dangerous_datetime_compare """
+  it is dangerous to compare DateTime against NaiveDateTime.
+
+  To fix this, always compare datetimes of a given type against the same type.
+  """
+
+  defp compare_datetime(%DateTime{}, %NaiveDateTime{}) do
+    error_result(@dangerous_datetime_compare)
+  end
+
+  defp compare_datetime(%NaiveDateTime{}, %DateTime{}) do
+    error_result(@dangerous_datetime_compare)
+  end
+
+  defp compare_datetime(_otherwise, %NaiveDateTime{} = _expected),
+    do: error_result(@impossible_occur_after_condition)
+
+  defp compare_datetime(%DateTime{} = given, %DateTime{} = expected) do
+    case DateTime.compare(given, expected) do
+      :eq -> success_result(false)
+      :lt -> success_result(false)
+      :gt -> success_result(true)
+    end
+  end
+
+  defp compare_datetime(%Date{} = given, %DateTime{} = expected) do
+    given_datetime = DateTime.new!(given, ~T[00:00:00], expected.time_zone)
+
+    case DateTime.compare(given_datetime, expected) do
+      :eq -> success_result(false)
+      :lt -> success_result(false)
+      :gt -> success_result(true)
+    end
+  end
+
+  defp compare_datetime(_otherwise, %DateTime{} = _expected),
+    do: error_result(@impossible_occur_after_condition)
 
   # # # Pattern matching
 
