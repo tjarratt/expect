@@ -43,6 +43,7 @@ defmodule Expect do
     quote do
       import Expect
       import Expect.Matchers
+      import Expect.Matchers.Temporal
     end
   end
 
