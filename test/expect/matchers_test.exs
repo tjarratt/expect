@@ -188,7 +188,7 @@ defmodule Expect.MatchersTest do
                    end
     end
 
-    test "returns a nice error when not called with a list" do
+    test "returns a nice error when not provided with a given list" do
       assert_raise AssertionError,
                    "Expected :whoopsie to contain [1, 2, 3] (regardless of order), but :whoopsie is not a list",
                    fn ->
