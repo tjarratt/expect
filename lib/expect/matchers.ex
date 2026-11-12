@@ -563,14 +563,14 @@ defmodule Expect.Matchers do
   def occur_after(%NaiveDateTime{} = expected_datetime) do
     %CustomMatcher{
       name: "occur after #{inspect(expected_datetime)}",
-      fn: &compare_datetime(&1, expected_datetime)
+      fn: &compare_datetime(&1, expected_datetime, :gt)
     }
   end
 
   def occur_after(%DateTime{} = expected_datetime) do
     %CustomMatcher{
       name: "occur after #{inspect(expected_datetime)}",
-      fn: &compare_datetime(&1, expected_datetime)
+      fn: &compare_datetime(&1, expected_datetime, :gt)
     }
   end
 
@@ -578,38 +578,26 @@ defmodule Expect.Matchers do
     %CustomMatcher{
       name: "occur after #{inspect(expected_date)}",
       fn: fn
-        %NaiveDateTime{} = given -> compare_date(given, expected_date)
-        %DateTime{} = given -> compare_date(given, expected_date)
-        %Date{} = given -> compare_date(given, expected_date)
+        %NaiveDateTime{} = given -> compare_date(given, expected_date, :gt)
+        %DateTime{} = given -> compare_date(given, expected_date, :gt)
+        %Date{} = given -> compare_date(given, expected_date, :gt)
         _otherwise -> error_result(@impossible_datetime_comparison)
       end
     }
   end
 
-  defp compare_date(given, expected_date) do
-    case Date.compare(given, expected_date) do
-      :eq -> success_result(false)
-      :lt -> success_result(false)
-      :gt -> success_result(true)
-    end
+  defp compare_date(given, expected_date, want) do
+    success_result(want == Date.compare(given, expected_date))
   end
 
-  defp compare_datetime(%NaiveDateTime{} = given, %NaiveDateTime{} = expected) do
-    case NaiveDateTime.compare(given, expected) do
-      :eq -> success_result(false)
-      :lt -> success_result(false)
-      :gt -> success_result(true)
-    end
+  defp compare_datetime(%NaiveDateTime{} = given, %NaiveDateTime{} = expected, want) do
+    success_result(want == NaiveDateTime.compare(given, expected))
   end
 
-  defp compare_datetime(%Date{} = given, %NaiveDateTime{} = expected) do
+  defp compare_datetime(%Date{} = given, %NaiveDateTime{} = expected, want) do
     given_datetime = NaiveDateTime.new!(given, ~T[00:00:00])
 
-    case NaiveDateTime.compare(given_datetime, expected) do
-      :eq -> success_result(false)
-      :lt -> success_result(false)
-      :gt -> success_result(true)
-    end
+    success_result(want == NaiveDateTime.compare(given_datetime, expected))
   end
 
   @dangerous_datetime_compare """
@@ -618,37 +606,29 @@ defmodule Expect.Matchers do
   To fix this, always compare datetimes of a given type against the same type.
   """
 
-  defp compare_datetime(%DateTime{}, %NaiveDateTime{}) do
+  defp compare_datetime(%DateTime{}, %NaiveDateTime{}, _want) do
     error_result(@dangerous_datetime_compare)
   end
 
-  defp compare_datetime(%NaiveDateTime{}, %DateTime{}) do
+  defp compare_datetime(%NaiveDateTime{}, %DateTime{}, _want) do
     error_result(@dangerous_datetime_compare)
   end
 
-  defp compare_datetime(_otherwise, %NaiveDateTime{} = _expected),
+  defp compare_datetime(_otherwise, %NaiveDateTime{} = _expected, _want),
     do: error_result(@impossible_datetime_comparison)
 
-  defp compare_datetime(%DateTime{} = given, %DateTime{} = expected) do
-    case DateTime.compare(given, expected) do
-      :eq -> success_result(false)
-      :lt -> success_result(false)
-      :gt -> success_result(true)
-    end
+  defp compare_datetime(%DateTime{} = given, %DateTime{} = expected, want) do
+    success_result(want == DateTime.compare(given, expected))
   end
 
-  defp compare_datetime(%Date{} = given, %DateTime{} = expected) do
+  defp compare_datetime(%Date{} = given, %DateTime{} = expected, want) do
     given_datetime = DateTime.new!(given, ~T[00:00:00], expected.time_zone)
 
-    case DateTime.compare(given_datetime, expected) do
-      :eq -> success_result(false)
-      :lt -> success_result(false)
-      :gt -> success_result(true)
-    end
+    success_result(want == DateTime.compare(given_datetime, expected))
   end
 
-  defp compare_datetime(_otherwise, %DateTime{} = _expected),
-    do: error_result(@impossible_occur_after_condition)
+  defp compare_datetime(_otherwise, %DateTime{} = _expected, _want),
+    do: error_result(@impossible_datetime_comparison)
 
   # # # Pattern matching
 
