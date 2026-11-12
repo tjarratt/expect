@@ -524,7 +524,11 @@ defmodule Expect.Matchers do
   @doc """
   Verifies that the given `Date`, `DateTime` or `NaiveDateTime` occurs strictly after the expected Date or DateTime.
 
-  Works the way you expect when comparing Dates against DateTimes, with the caveat that you cannot compare `DateTime` against `NaiveDateTime`. See notes below.
+  Works the way you would expect when comparing Dates against DateTimes, which is that a Date is considered to
+  be equivalent to midnight at the start of the day. Thus any DateTime at least one millisecond after midnight would
+  occur after its equivalent Date.
+
+  Do not compare `DateTime` against `NaiveDateTime`. See notes below.
 
   ```
   iex> expect(~U[2000-12-31 23:55:59Z], to: occur_after(~D[1999-01-01]))
