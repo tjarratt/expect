@@ -518,6 +518,8 @@ defmodule Expect.Matchers do
   defp verify_occurs_at(_component, :skip_it), do: true
   defp verify_occurs_at(component, expected_value), do: component == expected_value
 
+  @impossible_datetime_comparison "it was neither a Date, DateTime, nor NaiveDateTime"
+
   @doc """
   Verifies that the given `Date`, `DateTime` or `NaiveDateTime` occurs strictly after the expected Date or DateTime.
 
@@ -572,8 +574,6 @@ defmodule Expect.Matchers do
     }
   end
 
-  @impossible_occur_after_condition "it was neither a Date, DateTime, nor NaiveDateTime"
-
   def occur_after(%Date{} = expected_date) do
     %CustomMatcher{
       name: "occur after #{inspect(expected_date)}",
@@ -581,7 +581,7 @@ defmodule Expect.Matchers do
         %NaiveDateTime{} = given -> compare_date(given, expected_date)
         %DateTime{} = given -> compare_date(given, expected_date)
         %Date{} = given -> compare_date(given, expected_date)
-        _otherwise -> error_result(@impossible_occur_after_condition)
+        _otherwise -> error_result(@impossible_datetime_comparison)
       end
     }
   end
@@ -627,7 +627,7 @@ defmodule Expect.Matchers do
   end
 
   defp compare_datetime(_otherwise, %NaiveDateTime{} = _expected),
-    do: error_result(@impossible_occur_after_condition)
+    do: error_result(@impossible_datetime_comparison)
 
   defp compare_datetime(%DateTime{} = given, %DateTime{} = expected) do
     case DateTime.compare(given, expected) do
