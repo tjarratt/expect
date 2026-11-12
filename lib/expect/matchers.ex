@@ -642,6 +642,49 @@ defmodule Expect.Matchers do
   defp compare_datetime(_otherwise, %DateTime{} = _expected, _want),
     do: error_result(@impossible_datetime_comparison)
 
+  @doc """
+  Verifies that the given `Date`, `DateTime` or `NaiveDateTime` occurs strictly before the expected Date or DateTime.
+
+  Works the way you would expect when comparing Dates against DateTimes, which is that a Date is considered to
+  be equivalent to midnight at the start of the day. Thus any DateTime at least one millisecond after midnight would
+  occur after its equivalent Date.
+
+  Do not compare `DateTime` against `NaiveDateTime`. See notes below.
+
+  ```
+  iex> expect(~U[2000-12-31 23:59:59Z], to: occur_before(~D[2001-01-01]))
+  :ok
+
+  iex> expect(~N[2000-12-31 23:59:59], to: occur_before(~D[2001-01-01]))
+  :ok
+
+  iex> expect(~D[1998-12-31], to: occur_before(~D[1999-01-01]))
+  :ok
+
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_before(~U[2001-01-01 00:00:00Z]))
+  :ok
+
+  iex> expect(~D[2000-12-31], to: occur_before(~U[2001-01-01 00:00:00Z]))
+  :ok
+
+  iex> expect(~N[2000-12-31 23:55:59Z], to: occur_before(~N[2001-01-01 00:00:00]))
+  :ok
+
+  iex> expect(~D[2000-12-31], to: occur_before(~N[2001-01-01 00:00:00]))
+  :ok
+  ```
+
+  ## Do not compare DateTime against NaiveDateTime
+
+  For the same reasons of correctness that the elixir standard library doesn't allow you to compare `DateTime` against `NaiveDateTime`, expect's temporal matchers refuse to make such comparisons.
+
+  It's always safe to compare DateTime (with or without timezone) against Dates, but comparing DateTime with timezone against one is not well defined, and can lead to subtle bugs.
+
+  ```
+  iex> expect(~U[2000-12-31 23:55:59Z], to: occur_before(~N[2001-01-01 00:00:00]))
+  ** (Expect.AssertionError) Expected ~U[2000-12-31 23:55:59Z] to occur before ~N[2001-01-01 00:00:00], but it is dangerous to compare DateTime against NaiveDateTime...
+  ```
+  """
   @spec occur_before(Date.t() | DateTime.t() | NaiveDateTime.t()) :: t()
   def occur_before(%NaiveDateTime{} = expected_datetime) do
     %CustomMatcher{
