@@ -530,15 +530,16 @@ defmodule Expect.MatchersTest do
 
     test "can compare datetimes against dates" do
       expect(~U[2000-01-02 00:00:00Z], to: occur_after(~D[2000-01-01]))
-      expect(~N[2000-01-02 00:00:00], to: occur_after(~D[2000-01-01]))
+      expect(~U[2000-01-01 11:22:33Z], to: occur_after(~D[2000-01-01]))
 
-      # TODO: come back to these
-      # (these assertions appear wrong)
-      expect(~U[2000-01-01 11:22:33Z], to_not: occur_after(~D[2000-01-01]))
-      expect(~N[2000-01-01 11:22:33], to_not: occur_after(~D[2000-01-01]))
+      expect(~N[2000-01-02 00:00:00], to: occur_after(~D[2000-01-01]))
+      expect(~N[2000-01-01 11:22:33], to: occur_after(~D[2000-01-01]))
 
       expect(~U[1999-01-01 23:59:59Z], to_not: occur_after(~D[2000-01-01]))
+      expect(~N[2000-01-01 00:00:00Z], to_not: occur_after(~D[2000-01-01]))
+
       expect(~N[1999-01-01 23:59:59], to_not: occur_after(~D[2000-01-01]))
+      expect(~N[2000-01-01 00:00:00], to_not: occur_after(~D[2000-01-01]))
     end
 
     test "fails with a useful message when trying to compare DateTime against NaiveDateTime" do

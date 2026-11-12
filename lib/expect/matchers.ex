@@ -519,6 +519,7 @@ defmodule Expect.Matchers do
   defp verify_occurs_at(component, expected_value), do: component == expected_value
 
   @impossible_datetime_comparison "it was neither a Date, DateTime, nor NaiveDateTime"
+  @midnight ~T[00:00:00]
 
   @doc """
   Verifies that the given `Date`, `DateTime` or `NaiveDateTime` occurs strictly after the expected Date or DateTime.
@@ -578,10 +579,17 @@ defmodule Expect.Matchers do
     %CustomMatcher{
       name: "occur after #{inspect(expected_date)}",
       fn: fn
-        %NaiveDateTime{} = given -> compare_date(given, expected_date, :gt)
-        %DateTime{} = given -> compare_date(given, expected_date, :gt)
-        %Date{} = given -> compare_date(given, expected_date, :gt)
-        _otherwise -> error_result(@impossible_datetime_comparison)
+        %NaiveDateTime{} = given ->
+          compare_datetime(given, NaiveDateTime.new!(expected_date, @midnight), :gt)
+
+        %DateTime{} = given ->
+          compare_datetime(given, DateTime.new!(expected_date, @midnight), :gt)
+
+        %Date{} = given ->
+          compare_date(given, expected_date, :gt)
+
+        _otherwise ->
+          error_result(@impossible_datetime_comparison)
       end
     }
   end
@@ -595,7 +603,7 @@ defmodule Expect.Matchers do
   end
 
   defp compare_datetime(%Date{} = given, %NaiveDateTime{} = expected, want) do
-    given_datetime = NaiveDateTime.new!(given, ~T[00:00:00])
+    given_datetime = NaiveDateTime.new!(given, @midnight)
 
     success_result(want == NaiveDateTime.compare(given_datetime, expected))
   end
@@ -622,7 +630,7 @@ defmodule Expect.Matchers do
   end
 
   defp compare_datetime(%Date{} = given, %DateTime{} = expected, want) do
-    given_datetime = DateTime.new!(given, ~T[00:00:00], expected.time_zone)
+    given_datetime = DateTime.new!(given, @midnight, expected.time_zone)
 
     success_result(want == DateTime.compare(given_datetime, expected))
   end
