@@ -509,7 +509,6 @@ defmodule Expect.MatchersTest do
       expect(~U[2000-01-01 00:00:00Z], to_not: occur_after(~U[2000-01-01 00:00:00Z]))
       expect(~U[2000-01-01 00:00:00Z], to_not: occur_after(~U[2000-01-02 00:00:00Z]))
       expect(~U[2000-01-01 00:00:00Z], to_not: occur_after(~U[2000-01-01 10:00:00Z]))
-      P
 
       expect(~N[2000-01-01 10:00:00], to: occur_after(~N[2000-01-01 00:00:00]))
       expect(~N[2000-01-01 00:00:00], to: occur_after(~N[1999-12-31 23:59:59]))
