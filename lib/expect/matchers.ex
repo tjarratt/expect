@@ -630,6 +630,33 @@ defmodule Expect.Matchers do
   defp compare_datetime(_otherwise, %DateTime{} = _expected, _want),
     do: error_result(@impossible_datetime_comparison)
 
+  @spec occur_before(Date.t() | DateTime.t() | NaiveDateTime.t()) :: t()
+  def occur_before(%NaiveDateTime{} = expected_datetime) do
+    %CustomMatcher{
+      name: "occur before #{inspect(expected_datetime)}",
+      fn: &compare_datetime(&1, expected_datetime, :lt)
+    }
+  end
+
+  def occur_before(%DateTime{} = expected_datetime) do
+    %CustomMatcher{
+      name: "occur before #{inspect(expected_datetime)}",
+      fn: &compare_datetime(&1, expected_datetime, :lt)
+    }
+  end
+
+  def occur_before(%Date{} = expected_date) do
+    %CustomMatcher{
+      name: "occur before #{inspect(expected_date)}",
+      fn: fn
+        %NaiveDateTime{} = given -> compare_date(given, expected_date, :lt)
+        %DateTime{} = given -> compare_date(given, expected_date, :lt)
+        %Date{} = given -> compare_date(given, expected_date, :lt)
+        _otherwise -> error_result(@impossible_datetime_comparison)
+      end
+    }
+  end
+
   # # # Pattern matching
 
   @doc """
