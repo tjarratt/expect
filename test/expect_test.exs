@@ -91,6 +91,7 @@ defmodule ExpectTest do
 
   # # #
 
+  # re-implement equality so that these unit tests aren't dependent upon the matchers
   defp be_exactly(expected_value) do
     %Expect.Matchers.CustomMatcher{
       name: "be_exactly",
