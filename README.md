@@ -145,7 +145,7 @@ Here's a non-exhaustive list of features that are in our roadmap
     * defaults to 0.1
     * precision can be added
 
-Many of these features can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers)
+Many of these features can be found in other libraries, such as [gomega](https://onsi.github.io/gomega/#provided-matchers), [jasmine](https://jasmine.github.io/api/edge/matchers.html), [rspec](https://rspec.info/features/3-12/rspec-expectations/built-in-matchers/), and [cedar](https://github.com/cedarbdd/cedar/wiki/Writing-specs#matchers).
 
 ## Custom Matchers
 
