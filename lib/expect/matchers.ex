@@ -257,6 +257,7 @@ defmodule Expect.Matchers do
     error_result("#{inspect(given)} is not a list")
   end
 
+  @doc "Verifies that the given integer value is in the expected range"
   @spec be_in_range(Range.t()) :: t()
   def be_in_range(range) do
     %CustomMatcher{
