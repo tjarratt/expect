@@ -155,6 +155,14 @@ defmodule Expect do
 
          %Result{succeeded?: false} ->
            raise_error(unquote(given) |> inspect(), "to", matcher_name, expected)
+
+         otherwise ->
+           raise ProgrammerError,
+             message: """
+             Matcher '#{matcher_name}' returned an unexpected value : '#{inspect(otherwise)}'
+
+             Matchers should always return either Expect.Matchers.Result or Expect.Matchers.ErrorResult
+             """
        end).(result)
     end
   end
@@ -176,6 +184,14 @@ defmodule Expect do
 
          %Result{succeeded?: true} ->
            raise_error(unquote(given) |> inspect, "to not", matcher_name, expected)
+
+         otherwise ->
+           raise ProgrammerError,
+             message: """
+             Matcher '#{matcher_name}' returned an unexpected value : '#{inspect(otherwise)}'
+
+             Matchers should always return either Expect.Matchers.Result or Expect.Matchers.ErrorResult
+             """
        end).(result)
     end
   end

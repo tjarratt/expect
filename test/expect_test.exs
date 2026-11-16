@@ -89,6 +89,37 @@ defmodule ExpectTest do
     end
   end
 
+  describe "calling expect/2 with a badly-written matcher" do
+    @firstline "Matcher 'whoopsie-doodle' returned an unexpected value : 'false'"
+    @secondline "Matchers should always return either Expect.Matchers.Result or Expect.Matchers.ErrorResult"
+
+    test "raises a meaningful error to help the author debug the matcher's output" do
+      # we care both about the author of unit tests getting actionable feedback
+      # as well as the author of matchers. Ignoring for a moment that these are
+      # likely to be the same people, they both need different help at different times
+      #
+      # This test verifies that the matcher author gets the support they need when they goof it
+
+      error =
+        assert_raise ProgrammerError, fn ->
+          expect("oh no", to: work_with_a_badly_written_matcher())
+        end
+
+      assert error.message =~ @firstline
+      assert error.message =~ @secondline
+    end
+
+    test "raises a meaningful error for to_not:" do
+      error =
+        assert_raise ProgrammerError, fn ->
+          expect("oh no", to_not: work_with_a_badly_written_matcher())
+        end
+
+      assert error.message =~ @firstline
+      assert error.message =~ @secondline
+    end
+  end
+
   # # #
 
   # re-implement equality so that these unit tests aren't dependent upon the matchers
@@ -99,6 +130,13 @@ defmodule ExpectTest do
       fn: fn given ->
         %Expect.Matchers.Result{succeeded?: given == expected_value}
       end
+    }
+  end
+
+  defp work_with_a_badly_written_matcher() do
+    %Expect.Matchers.CustomMatcher{
+      name: "whoopsie-doodle",
+      fn: fn _given -> false end
     }
   end
 end
