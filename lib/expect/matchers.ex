@@ -206,7 +206,6 @@ defmodule Expect.Matchers do
   ** (Expect.AssertionError) Expected [1, 2, 3] to only contain [2, 1]
   ```
   """
-
   @spec contain(any()) :: t()
   @spec contain(only: any()) :: t()
   def contain(only: one_value) do
