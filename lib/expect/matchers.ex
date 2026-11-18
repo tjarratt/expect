@@ -92,7 +92,6 @@ defmodule Expect.Matchers do
   """
   @type t :: %CustomMatcher{
           name: matcher_name :: String.t(),
-          expected: matched_against :: any(),
           fn: (given :: any() -> %Result{} | %ErrorResult{})
         }
 

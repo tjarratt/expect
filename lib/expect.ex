@@ -140,7 +140,7 @@ defmodule Expect do
 
   defmacro expect(given, to: matcher_args) do
     quote generated: true do
-      %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
+      %CustomMatcher{name: matcher_name, fn: matcher} = unquote(matcher_args)
 
       result = matcher.(unquote(given))
 
@@ -154,7 +154,7 @@ defmodule Expect do
            :ok
 
          %Result{succeeded?: false} ->
-           raise_error(unquote(given) |> inspect(), "to", matcher_name, expected)
+           raise_error(unquote(given) |> inspect(), "to", matcher_name)
 
          otherwise ->
            raise ProgrammerError,
@@ -169,7 +169,7 @@ defmodule Expect do
 
   defmacro expect(given, to_not: matcher_args) do
     quote generated: true do
-      %CustomMatcher{name: matcher_name, expected: expected, fn: matcher} = unquote(matcher_args)
+      %CustomMatcher{name: matcher_name, fn: matcher} = unquote(matcher_args)
 
       result = matcher.(unquote(given))
 
@@ -183,7 +183,7 @@ defmodule Expect do
            :ok
 
          %Result{succeeded?: true} ->
-           raise_error(unquote(given) |> inspect, "to not", matcher_name, expected)
+           raise_error(unquote(given) |> inspect, "to not", matcher_name)
 
          otherwise ->
            raise ProgrammerError,
@@ -199,15 +199,9 @@ defmodule Expect do
   # # # Internal - intended to be private but left public so macros can refer to them
 
   @doc false
-  def raise_error(given, proposition, matcher_property, %Expect.Matchers.NoValue{}) do
+  def raise_error(given, proposition, matcher_property) do
     raise Expect.AssertionError,
       message: "Expected #{given} #{proposition} #{matcher_property}"
-  end
-
-  @doc false
-  def raise_error(given, proposition, matcher_property, expected) do
-    raise Expect.AssertionError,
-      message: "Expected #{given} #{proposition} #{matcher_property} #{inspect(expected)}"
   end
 
   @doc false

@@ -1,13 +1,7 @@
-defmodule Expect.Matchers.NoValue do
-  @moduledoc false
-  defstruct([])
-
-  # # # Sentinel value to distinguish between two cases that are distinct but look similar
-  # scenario 1 : expected is `nil` because the value passed to `expect` is literally `nil`
-  # scenario 2 : the matcher does not receive an input that should be shown in the error message
-end
-
 defmodule Expect.Matchers.CustomMatcher do
+  @enforce_keys [:name, :fn]
+  defstruct name: nil, fn: nil
+
   @moduledoc """
   You are highly encouraged to implement your own custom matchers. For the application you
   will build, there will surely be some interesting properties and shapes of data that
@@ -54,11 +48,5 @@ defmodule Expect.Matchers.CustomMatcher do
 
   expect("🍌", to: be_bananas())
   ```
-
   """
-
-  alias Expect.Matchers.NoValue
-
-  @enforce_keys [:name, :fn]
-  defstruct name: nil, expected: %NoValue{}, fn: nil
 end
