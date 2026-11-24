@@ -19,6 +19,7 @@ end
 defmodule Expect.Matchers do
   # @related [tests](test/expect/matchers_test.exs)
   # @related [temporal](lib/expect/matchers/temporal.ex)
+  # @related [composition](lib/expect/matchers/composition.ex)
 
   alias Expect.Matchers.CustomMatcher
   alias Expect.Matchers.ErrorResult
