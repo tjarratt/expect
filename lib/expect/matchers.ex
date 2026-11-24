@@ -400,7 +400,7 @@ defmodule Expect.Matchers do
           success_result(true)
 
         tuple when is_tuple(tuple) and tuple_size(tuple) > 2 and elem(tuple, 0) == :error ->
-          error_result("it was neither :error or {:error, something}")
+          error_result("it was neither :error nor {:error, something}")
 
         _otherwise ->
           success_result(false)

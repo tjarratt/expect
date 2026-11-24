@@ -422,7 +422,7 @@ defmodule Expect.MatchersTest do
 
     test "fails when the actual is an error tuple of size > 2" do
       assert_raise AssertionError,
-                   ~s[Expected {:error, "whoops", nil} to be an error tuple, but it was neither :error or {:error, something}],
+                   ~s[Expected {:error, "whoops", nil} to be an error tuple, but it was neither :error nor {:error, something}],
                    fn ->
                      expect({:error, "whoops", nil}, to: be_an_error())
                    end
