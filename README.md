@@ -12,22 +12,24 @@ While initially this may appear to be a simple case of style, over time
 you will find that these assertions read better, simplify your tests, 
 and allow you to write tests that more clearly reveal their intent.
 
-Instead of writing the following...
+Instead of writing the following ...
 
 ```elixir
-subject = %Author{name: "Douglas Adams", answer: 42}
+poem = %Poem{author: "Lewis Carrol", year_published: 1871, text: File.read!("jabberwocky.txt")}
 
-assert subject.name == "Douglas Adams"
-assert subject.answer == 42
+assert poem.author == "Lewis Carrol"
+assert poem.year_published > 1800
+assert poem.text =~ "gyre and gimble"
 ```
 
-you can write...
+you can write ...
 
 ```elixir
 use Expect
 
-expect(subject.name, to: equal("Douglas Adams"))
-expect(subject.answer, to: be_the_answer_to_life_the_universe_and_everything_else())
+expect(poem.author, to: equal("Lewis Carrol"))
+expect(poem.year, to: be_greater_than(1800))
+expect(poem.body, to: match_regex(~r"gyre and gimble"))
 ```
 
 See the documentation on `Expect.Matchers` for more examples of matchers to use.
