@@ -165,7 +165,7 @@ the type of banana we supply them will vary (maybe they prefer it more or less r
 A simple version of our custom bananas matcher could look like this
 
 ```elixir
-defmodule MyFancyMatchers do
+defmodule MyApp.FancyMatchers do
     alias Expect.Matchers.CustomMatcher
 
     def be_bananas() do
@@ -185,7 +185,7 @@ defmodule MyFancyMatchers do
 end
 
 use Expect
-import MyFancyMatchers
+import MyApp.FancyMatchers
 
 expect("🍌", to: be_bananas())
 ```
